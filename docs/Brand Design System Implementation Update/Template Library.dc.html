@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Template library — Nnọọ Brand Studio</title>
+<link rel="stylesheet" href="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/colors_and_type.css">
+<link rel="stylesheet" href="assets/brand/fonts/fonts.css">
+<script src="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/_ds_bundle.js"></script>
+<style>body{margin:0}*{box-sizing:border-box}a{color:var(--brand)}a:hover{color:var(--brand-hover)}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--font-body)">
+<dc-import name="Nnoo App Header" active="templates" hint-size="100%,61px"></dc-import>
+<main style="max-width:1440px;margin:0 auto;padding:40px 20px 120px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between">
+<div style="max-width:720px"><div style="font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle)">Template library</div>
+<h1 style="font-family:var(--font-display);font-size:clamp(32px,4vw,48px);line-height:1.08;letter-spacing:-0.02em;margin:8px 0 10px">Start from the brand, not a blank page</h1>
+<p style="margin:0;font-size:16px;line-height:1.6;color:var(--fg-muted);text-wrap:pretty">{{ countLine }}</p></div>
+<label style="display:flex;flex-direction:column;gap:6px;min-width:260px;flex:0 1 340px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Search templates</span><input type="search" value="{{ q }}" onChange="{{ setQ }}" placeholder="e.g. poll, LinkedIn, proposal" style="height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);color:var(--fg);padding:0 14px;font-size:15px"></label>
+</div>
+
+<nav aria-label="Categories" style="display:flex;gap:8px;flex-wrap:wrap">
+<sc-for list="{{ cats }}" as="c" hint-placeholder-count="10"><button type="button" onClick="{{ c.pick }}" aria-pressed="{{ c.on }}" style="{{ c.st }}">{{ c.label }}<span style="{{ c.nSt }}">{{ c.n }}</span></button></sc-for>
+</nav>
+
+<sc-if value="{{ showGen }}">
+<section aria-label="Article banner generator" style="background:var(--bg-raised);border:1px solid var(--border);border-radius:24px;padding:24px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:flex-start">
+<div style="max-width:560px"><h2 style="font-family:var(--font-display);font-size:24px;margin:0 0 6px;letter-spacing:-0.01em">Article banner generator</h2><p style="margin:0;font-size:14px;line-height:1.6;color:var(--fg-muted)">Type a title and optional subtitle. Every editorial layout updates for the channels you pick. Open any one to refine it, or download them all.</p></div>
+<button type="button" onClick="{{ genZip }}" disabled="{{ busy }}" style="height:44px;padding:0 18px;border-radius:12px;border:none;background:var(--brand);color:var(--fg-on-clay);font-family:var(--font-display);font-weight:600;font-size:14px;cursor:pointer">{{ genZipLabel }}</button>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+<label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Article title</span><input type="text" value="{{ gTitle }}" onChange="{{ setGTitle }}" style="height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);color:var(--fg);padding:0 14px;font-size:15px"></label>
+<label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Subtitle (optional)</span><input type="text" value="{{ gSub }}" onChange="{{ setGSub }}" style="height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);color:var(--fg);padding:0 14px;font-size:15px"></label>
+<label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Eyebrow / publication</span><input type="text" value="{{ gEyebrow }}" onChange="{{ setGEyebrow }}" style="height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);color:var(--fg);padding:0 14px;font-size:15px"></label>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Image (for image layouts)</span><label style="height:44px;display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--border-strong);border-radius:12px;background:var(--bg-card);font-size:13px;font-weight:600;color:var(--fg-muted);cursor:pointer;position:relative">{{ gImgLabel }}<input type="file" accept="image/*" onChange="{{ setGImg }}" style="position:absolute;width:1px;height:1px;opacity:0"></label></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Channels</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ channels }}" as="ch"><button type="button" onClick="{{ ch.pick }}" aria-pressed="{{ ch.on }}" style="{{ ch.st }}">{{ ch.label }}</button></sc-for></div></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+<sc-for list="{{ genCards }}" as="g"><div style="background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px">
+<div style="{{ g.box }}"><dc-import name="Nnoo Page" view="{{ g.view }}" hint-size="276px,120px"></dc-import></div>
+<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><div style="min-width:0"><div style="font-weight:600;font-size:14px">{{ g.name }}</div><div style="font-size:12px;color:var(--fg-subtle)">{{ g.meta }}</div></div>
+<div style="display:flex;gap:6px;flex:none"><button type="button" onClick="{{ g.dl }}" title="Download PNG" style="{{ smallBtn }}">↓ PNG</button><button type="button" onClick="{{ g.open }}" style="{{ smallBtnBrand }}">Edit</button></div></div>
+</div></sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-if value="{{ showMine }}">
+<section aria-label="My documents" style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center"><div><h2 style="font-family:var(--font-display);font-size:24px;margin:0">Your saved documents</h2><p style="margin:4px 0 0;font-size:13px;color:var(--fg-subtle)">{{ storageLine }}</p></div>
+<label style="height:40px;display:inline-flex;align-items:center;padding:0 16px;border-radius:12px;border:1px solid var(--border-strong);background:var(--bg-card);font-size:13px;font-weight:600;cursor:pointer;position:relative">Import project file (.json)<input type="file" accept=".json,application/json" onChange="{{ importJson }}" style="position:absolute;width:1px;height:1px;opacity:0"></label></div>
+<sc-if value="{{ noDocs }}"><div style="border:1.5px dashed var(--border-strong);border-radius:18px;padding:40px 24px;text-align:center;color:var(--fg-muted)"><p style="margin:0 0 4px;font-family:var(--font-display);font-size:18px;color:var(--fg)">Nothing saved yet.</p><p style="margin:0;font-size:14px">Open any template to start — your edits save in this browser automatically.</p></div></sc-if>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+<sc-for list="{{ mine }}" as="m"><div style="{{ m.cardSt }}">
+<div style="display:flex;justify-content:space-between;align-items:center"><button type="button" role="checkbox" aria-checked="{{ m.on }}" aria-label="Select for bulk export" onClick="{{ m.toggle }}" style="{{ m.chk }}">{{ m.chkMark }}</button><span style="font-size:11px;color:var(--fg-subtle)">{{ m.date }}</span></div>
+<div style="{{ m.box }}"><dc-import name="Nnoo Page" view="{{ m.view }}" hint-size="236px,160px"></dc-import></div>
+<div><div style="font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.name }}</div><div style="font-size:12px;color:var(--fg-subtle)">{{ m.meta }}</div></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><a href="{{ m.href }}" style="{{ linkBtn }}">Open</a><button type="button" onClick="{{ m.dl }}" style="{{ smallBtn }}">↓ PNG</button><button type="button" onClick="{{ m.json }}" style="{{ smallBtn }}">Project file</button><button type="button" onClick="{{ m.dup }}" style="{{ smallBtn }}">Duplicate</button><button type="button" onClick="{{ m.del }}" style="{{ dangerBtn }}">Delete</button></div>
+</div></sc-for>
+</div>
+</section>
+</sc-if>
+
+<sc-for list="{{ groups }}" as="gr" hint-placeholder-count="1">
+<section style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><h2 style="font-family:var(--font-display);font-size:24px;margin:0;letter-spacing:-0.01em">{{ gr.name }}</h2><span style="font-size:13px;color:var(--fg-subtle)">{{ gr.note }}</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px">
+<sc-for list="{{ gr.items }}" as="t" hint-placeholder-count="4"><article style="{{ t.cardSt }}">
+<div style="display:flex;justify-content:space-between;align-items:center"><button type="button" role="checkbox" aria-checked="{{ t.on }}" aria-label="Select for bulk export" onClick="{{ t.toggle }}" style="{{ t.chk }}">{{ t.chkMark }}</button><span style="font-size:11px;color:var(--fg-subtle);text-align:right">{{ t.dims }}</span></div>
+<button type="button" onClick="{{ t.open }}" title="{{ t.openLabel }}" style="{{ t.box }}"><dc-import name="Nnoo Page" view="{{ t.view }}" hint-size="226px,170px"></dc-import></button>
+<div style="min-width:0"><h3 style="margin:0;font-family:var(--font-display);font-size:15px;font-weight:600;line-height:1.3">{{ t.name }}</h3><div style="font-size:12px;color:var(--fg-subtle);margin-top:2px">{{ t.meta }}</div></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+<button type="button" onClick="{{ t.open }}" style="{{ smallBtnBrand }}">Edit</button>
+<sc-if value="{{ t.multi }}"><select aria-label="Format" value="{{ t.fmt }}" onChange="{{ t.setFmt }}" style="height:32px;border:1px solid var(--border);border-radius:9px;background:var(--bg-card);color:var(--fg);font-size:12px;max-width:150px"><sc-for list="{{ t.fmts }}" as="o"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.l }}</option></sc-for></select></sc-if>
+<button type="button" onClick="{{ t.dl }}" title="{{ t.dlTitle }}" style="{{ smallBtn }}">{{ t.dlLabel }}</button>
+</div>
+</article></sc-for>
+</div>
+</section>
+</sc-for>
+</main>
+
+<sc-if value="{{ hasSel }}"><div role="region" aria-label="Bulk export" style="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:50;background:var(--bg-inverse);color:var(--fg-inverse);border-radius:18px;box-shadow:var(--shadow-xl);padding:10px 10px 10px 18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;max-width:calc(100vw - 32px)">
+<span style="font-size:14px;font-weight:600">{{ selLine }}</span>
+<button type="button" onClick="{{ bulkPng }}" disabled="{{ busy }}" style="height:40px;padding:0 16px;border-radius:12px;border:none;background:var(--brand);color:var(--fg-on-clay);font-weight:600;font-size:13px;cursor:pointer">{{ bulkLabel }}</button>
+<button type="button" onClick="{{ bulkJson }}" style="height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(250,245,236,0.3);background:transparent;color:inherit;font-weight:600;font-size:13px;cursor:pointer">Project files (ZIP)</button>
+<button type="button" onClick="{{ clearSel }}" style="height:40px;padding:0 12px;border-radius:12px;border:none;background:transparent;color:inherit;font-size:13px;cursor:pointer">Clear</button>
+</div></sc-if>
+
+<div aria-hidden="true" ref="{{ stageRef }}" style="position:fixed;left:-200000px;top:0;pointer-events:none">
+<sc-for list="{{ stage }}" as="sp"><div style="margin-bottom:20px"><dc-import name="Nnoo Page" view="{{ sp.view }}" hint-size="10px,10px"></dc-import></div></sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: false, cat: 'square', q: '', sel: {}, fmt: {}, busy: false, stage: [], g: { title: 'Why we record elders before we teach', sub: 'On consent, provenance and patience.', eyebrow: 'Nnọọ Journal', img: null, ch: { 'x-article': true, 'li-article': true, medium: true } }, docsV: 0 };
+  async componentDidMount() {
+    const u = p => import(new URL(p, location.href).href);
+    [this.T, this.R, this.S, this.A, this.X] = await Promise.all([u('lib/templates.js'), u('lib/render.js'), u('lib/store.js'), u('lib/app.js'), u('lib/export.js')]);
+    this.A.initTheme(); this.cache = {};
+    const h = this.A.hashParams(); this.setState({ ready: true, cat: h.cat || 'square' });
+  }
+  all() { return this.T.TEMPLATES.concat(this.T.DOC_TEMPLATES); }
+  docFor(t, fmt) { const k = t.id + '|' + (fmt || ''); if (!this.cache[k]) this.cache[k] = this.T.newDocFromTemplate(t, fmt); return this.cache[k]; }
+  genDoc(t, fmt) {
+    const g = this.state.g; const d = this.T.newDocFromTemplate(t, fmt);
+    const content = { title: g.title || ' ', body: g.sub || '', eyebrow: g.eyebrow || '' }; if (g.img) content.image = g.img;
+    d.content = content; const out = this.T.relayoutGraphic(d, t, {}); out.name = (g.title || t.name).slice(0, 60) + ' — ' + this.T.FORMATS[fmt].label; return out;
+  }
+  async renderDocs(docs, type = 'png') {
+    // mount every page at full size off-screen, capture, then unmount
+    const stage = []; docs.forEach((d, di) => d.pages.forEach((p, pi) => stage.push({ d, di, pi, view: this.R.pageView(d, pi, { zoom: 1, nums: this.X.pageNumbers(d), toc: this.X.tocItems(d) }) })));
+    await new Promise(r => this.setState({ stage }, r)); await new Promise(r => setTimeout(r, 400)); await document.fonts.ready;
+    const out = [];
+    for (const s of stage) { const n = this.stageEl.querySelector(`[data-page-root="${s.d.pages[s.pi].id}"]`); const url = await this.X.renderPage(n, s.d.w, s.d.pages[s.pi].h || s.d.h, { type, scale: 1 }); out.push({ ...s, url }); }
+    this.setState({ stage: [] }); return out;
+  }
+  async quick(docs, zipName) {
+    if (this.state.busy) return; this.setState({ busy: true });
+    try {
+      const r = await this.renderDocs(docs);
+      if (r.length === 1) this.A.download(r[0].url, this.X.fileBase(r[0].d) + '.png');
+      else { const files = r.map(x => ({ name: (docs.length > 1 ? this.A.slug(x.d.name) + '-' + x.d.w + 'x' + x.d.h + '/' : '') + String(x.pi + 1).padStart(2, '0') + '-' + this.A.slug(x.d.pages[x.pi].name) + '.png', data: this.X.b64(x.url), base64: true })); this.A.download(await this.X.zipFiles(files), zipName || 'nnoo-export.zip'); }
+      this.A.toast('Downloaded ' + r.length + (r.length === 1 ? ' image' : ' images'));
+    } catch (e) { console.error(e); this.A.toast('Export failed: ' + e.message, 'err'); }
+    this.setState({ busy: false, stage: [] });
+  }
+  open(doc) { try { const d = JSON.parse(JSON.stringify(doc)); d.id = this.T.uid('d'); d.created = d.updated = Date.now(); this.S.saveDoc(d); location.href = 'Editor.dc.html#doc=' + d.id; } catch (e) { this.A.toast(e.message, 'err'); } }
+  async importJson(e) {
+    const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+    try { const j = JSON.parse(await f.text()); const docs = j.nnooProject ? [j.doc] : j.nnooBundle ? j.docs : null; if (!docs || !docs.every(d => d && d.pages && d.w)) throw new Error('This is not a Nnọọ project file.'); docs.forEach(d => { d.id = this.T.uid('d'); this.S.saveDoc(d); }); this.setState({ docsV: this.state.docsV + 1, cat: 'mine' }); this.A.toast('Imported ' + docs.length + (docs.length === 1 ? ' document' : ' documents')); }
+    catch (err) { this.A.toast('Import failed: ' + err.message, 'err'); }
+  }
+  renderVals() {
+    const s = this.state;
+    const pill = on => ({ display: 'inline-flex', alignItems: 'center', gap: '8px', height: '40px', padding: '0 14px', borderRadius: '999px', border: on ? '1px solid var(--brand)' : '1px solid var(--border)', background: on ? 'var(--brand)' : 'var(--bg-card)', color: on ? 'var(--fg-on-clay)' : 'var(--fg)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' });
+    const smallBtn = { height: '32px', padding: '0 12px', borderRadius: '9px', border: '1px solid var(--border-strong)', background: 'var(--bg-card)', color: 'var(--fg)', fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', textDecoration: 'none' };
+    const common = { smallBtn, smallBtnBrand: { ...smallBtn, border: 'none', background: 'var(--brand)', color: 'var(--fg-on-clay)' }, linkBtn: { ...smallBtn, border: 'none', background: 'var(--brand)', color: 'var(--fg-on-clay)' }, dangerBtn: { ...smallBtn, color: 'var(--danger)', borderColor: 'var(--danger)' }, stageRef: el => { this.stageEl = el; }, importJson: e => this.importJson(e), busy: s.busy, q: s.q, setQ: e => this.setState({ q: e.target.value }) };
+    if (!s.ready) return { ...common, countLine: 'Loading templates…', cats: [], groups: [], stage: [], showGen: false, showMine: false, hasSel: false };
+    const T = this.T, R = this.R, all = this.all();
+    const nFormats = new Set(all.flatMap(t => t.kind === 'doc' ? t.formats.map(f => t.docKind + f) : t.formats)).size;
+    const docs = this.S.listDocs();
+    const cats = [{ id: 'all', name: 'All' }].concat(T.CATEGORIES).concat([{ id: 'mine', name: 'My documents' }]).map(c => ({ label: c.name, n: c.id === 'all' ? all.length : c.id === 'mine' ? docs.length : all.filter(t => t.cat === c.id).length, on: s.cat === c.id, pick: () => { this.setState({ cat: c.id }); this.A.setHash({ cat: c.id }); }, st: pill(s.cat === c.id), nSt: { fontSize: '11px', fontWeight: 600, padding: '2px 7px', borderRadius: '999px', background: s.cat === c.id ? 'rgba(250,245,236,0.22)' : 'var(--bg-raised)' } }));
+    const q = s.q.trim().toLowerCase();
+    const match = t => !q || (t.name + ' ' + t.cat + ' ' + (t.formats || []).map(f => (T.FORMATS[f] || {}).label || f).join(' ') + ' ' + (t.docKind || '')).toLowerCase().includes(q);
+    const card = (on) => ({ background: 'var(--bg-card)', border: on ? '2px solid var(--brand)' : '1px solid var(--border)', borderRadius: '18px', padding: on ? '11px' : '12px', display: 'flex', flexDirection: 'column', gap: '10px', boxShadow: 'var(--shadow-sm)' });
+    const chk = on => ({ width: '26px', height: '26px', borderRadius: '8px', border: on ? 'none' : '1.5px solid var(--border-strong)', background: on ? 'var(--brand)' : 'var(--bg-card)', color: 'var(--fg-on-clay)', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 });
+    const boxFor = (d, bw, bh) => { const p = d.pages[0], H = p.h || d.h; const z = Math.min(bw / d.w, bh / H); return { z, st: { height: bh + 'px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-raised)', borderRadius: '12px', border: 'none', padding: 0, cursor: 'pointer', overflow: 'hidden' } }; };
+    const groups = [];
+    if (s.cat !== 'mine') {
+      const cs = s.cat === 'all' ? T.CATEGORIES : T.CATEGORIES.filter(c => c.id === s.cat);
+      cs.forEach(c => {
+        const items = all.filter(t => t.cat === c.id && match(t)).map(t => {
+          const fmt = s.fmt[t.id] || t.formats[0]; const d = this.docFor(t, fmt); const b = boxFor(d, 226, 170); const on = !!s.sel[t.id];
+          const fl = t.kind === 'doc' ? T.DOC_KINDS[t.docKind].sizes.map(z => ({ v: z.id, l: z.label })) : t.formats.map(f => ({ v: f, l: T.FORMATS[f].label + ' ' + T.FORMATS[f].w + '×' + T.FORMATS[f].h })); fl.forEach(o => { o.sel = o.v === fmt; });
+          return { name: t.name, dims: d.w + ' × ' + d.h, meta: t.kind === 'doc' ? T.DOC_KINDS[t.docKind].name + ' · ' + d.pages.length + ' pages · ' + T.DOC_KINDS[t.docKind].exports.map(x => x.toUpperCase()).join(', ') : (t.formats.length > 1 ? t.formats.length + ' formats' : T.FORMATS[fmt].label) + (d.pages.length > 1 ? ' · ' + d.pages.length + ' slides' : ''),
+            view: R.pageView(d, 0, { zoom: b.z, thumb: true, nums: this.X.pageNumbers(d), toc: this.X.tocItems(d) }), box: b.st, open: () => this.open(d), openLabel: 'Edit ' + t.name, multi: fl.length > 1, fmts: fl, fmt, setFmt: e => this.setState({ fmt: { ...s.fmt, [t.id]: e.target.value } }),
+            dl: () => this.quick([d], 'nnoo-' + this.A.slug(t.name) + '.zip'), dlLabel: d.pages.length > 1 ? 'ZIP' : 'PNG', dlTitle: d.pages.length > 1 ? 'Download every page as PNG (ZIP)' : 'Download PNG at full size',
+            on, toggle: () => this.setState({ sel: { ...s.sel, [t.id]: on ? undefined : { t, fmt } } }), chk: chk(on), chkMark: on ? '✓' : '', cardSt: card(on) };
+        });
+        if (items.length) groups.push({ name: c.name, note: c.note + ' · ' + items.length + (items.length === 1 ? ' template' : ' templates'), items });
+      });
+    }
+    // generator
+    const showGen = s.cat === 'editorial' || (s.cat === 'all' && !q);
+    let gen = {};
+    if (showGen) {
+      const g = s.g; const chosen = Object.keys(g.ch).filter(k => g.ch[k]);
+      const eds = T.TEMPLATES.filter(t => t.editorial);
+      const genCards = []; eds.forEach(t => chosen.forEach(f => { const d = this.genDoc(t, f); const b = boxFor(d, 276, 150); genCards.push({ name: t.name.replace('Article — ', ''), meta: T.FORMATS[f].label + ' · ' + d.w + ' × ' + d.h, view: R.pageView(d, 0, { zoom: b.z, thumb: true }), box: { ...b.st, cursor: 'default' }, open: () => this.open(d), dl: () => this.quick([d]) }); }));
+      gen = { gTitle: g.title, gSub: g.sub, gEyebrow: g.eyebrow, setGTitle: e => this.setState({ g: { ...this.state.g, title: e.target.value } }), setGSub: e => this.setState({ g: { ...this.state.g, sub: e.target.value } }), setGEyebrow: e => this.setState({ g: { ...this.state.g, eyebrow: e.target.value } }),
+        gImgLabel: g.img ? 'Image added — replace' : 'Upload image', setGImg: e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; const fr = new FileReader(); fr.onload = () => { const im = new Image(); im.onload = () => { const k = Math.min(1, 1800 / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = im.width * k; c.height = im.height * k; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); this.setState({ g: { ...this.state.g, img: c.toDataURL('image/jpeg', 0.86) } }); }; im.src = fr.result; }; fr.readAsDataURL(f); },
+        channels: T.TEMPLATES.find(t => t.editorial).formats.map(f => ({ label: T.FORMATS[f].label + ' ' + T.FORMATS[f].w + '×' + T.FORMATS[f].h, on: !!g.ch[f], pick: () => this.setState({ g: { ...this.state.g, ch: { ...this.state.g.ch, [f]: !this.state.g.ch[f] } } }), st: { ...pill(!!g.ch[f]), height: '36px', fontSize: '12px' } })),
+        genCards, genZipLabel: s.busy ? 'Working…' : 'Download all ' + genCards.length + ' (ZIP)', genZip: () => this.quick(eds.flatMap(t => chosen.map(f => this.genDoc(t, f))), 'nnoo-article-banners.zip') };
+    }
+    // my documents
+    let mine = []; const showMine = s.cat === 'mine';
+    if (showMine) mine = docs.filter(m => !q || m.name.toLowerCase().includes(q)).map(m => { const d = this.S.getDoc(m.id); if (!d) return null; const b = boxFor(d, 236, 160); const key = 'doc:' + m.id; const on = !!s.sel[key]; return { name: d.name, meta: d.w + ' × ' + d.h + ' · ' + d.pages.length + (d.pages.length === 1 ? ' page' : ' pages'), date: new Date(d.updated).toLocaleString(), view: R.pageView(d, 0, { zoom: b.z, thumb: true, nums: this.X.pageNumbers(d), toc: this.X.tocItems(d) }), box: { ...b.st, cursor: 'default' }, href: 'Editor.dc.html#doc=' + d.id, dl: () => this.quick([d], 'nnoo-' + this.A.slug(d.name) + '.zip'), json: () => this.A.download(new Blob([JSON.stringify({ nnooProject: 1, doc: d })], { type: 'application/json' }), this.X.fileBase(d) + '.nnoo.json'), dup: () => { const c = JSON.parse(JSON.stringify(d)); c.id = this.T.uid('d'); c.name += ' (copy)'; this.S.saveDoc(c); this.setState({ docsV: s.docsV + 1 }); this.A.toast('Duplicated'); }, del: () => { if (confirm('Delete “' + d.name + '” from this browser? This cannot be undone.')) { this.S.deleteDoc(d.id); this.setState({ docsV: s.docsV + 1, sel: { ...s.sel, [key]: undefined } }); this.A.toast('Deleted'); } }, on, toggle: () => this.setState({ sel: { ...s.sel, [key]: on ? undefined : { doc: d } } }), chk: chk(on), chkMark: on ? '✓' : '', cardSt: card(on) }; }).filter(Boolean);
+    const selected = Object.values(s.sel).filter(Boolean);
+    const selDocs = () => selected.map(x => x.doc || this.docFor(x.t, x.fmt));
+    const stage = s.stage.map(x => ({ view: x.view }));
+    return { ...common, ...gen, showGen, showMine, mine, noDocs: showMine && !docs.length, storageLine: docs.length + (docs.length === 1 ? ' document' : ' documents') + ' saved in this browser · ' + Math.round(this.S.storageUse() / 1024) + ' KB of about 5 MB used',
+      countLine: all.length + ' templates across ' + T.CATEGORIES.length + ' categories and ' + nFormats + ' sizes — social, advertising, email, web, editorial and multi-page documents. Every one opens in the editor and exports at its real dimensions.',
+      cats, groups, stage, hasSel: selected.length > 0, selLine: selected.length + ' selected', bulkLabel: s.busy ? 'Exporting…' : 'Download PNGs (ZIP)', bulkPng: () => this.quick(selDocs(), 'nnoo-templates.zip'),
+      bulkJson: async () => { const ds = selDocs(); const files = ds.map(d => ({ name: this.X.fileBase(d) + '.nnoo.json', data: JSON.stringify({ nnooProject: 1, doc: d }) })); this.A.download(await this.X.zipFiles(files), 'nnoo-project-files.zip'); }, clearSel: () => this.setState({ sel: {} }) };
+  }
+}
+</script>
+</body>
+</html>

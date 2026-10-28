@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div data-page-outer="{{ view.pid }}" style="{{ view.outerStyle }}">
+<div data-page-root="{{ view.pid }}" style="{{ view.rootStyle }}" onPointerDown="{{ view.pageDown }}">
+<sc-if value="{{ view.hasBgImage }}" hint-placeholder-val="{{ false }}"><div style="{{ view.bgStyle }}"></div></sc-if>
+<div style="{{ view.contStyle }}">
+<sc-for list="{{ view.els }}" as="el" hint-placeholder-count="0">
+<div data-el-id="{{ el.id }}" style="{{ el.wrap }}" onPointerDown="{{ el.down }}" onDoubleClick="{{ el.dbl }}">
+<sc-if value="{{ el.isPlain }}"><div data-text="1" style="{{ el.textStyle }}" contentEditable="{{ el.editing }}" suppressContentEditableWarning="{{ true }}" onBlur="{{ el.blur }}">{{ el.text }}</div></sc-if>
+<sc-if value="{{ el.isList }}"><div style="{{ el.textStyle }}"><sc-for list="{{ el.lines }}" as="ln"><div style="{{ ln.st }}"><span style="{{ ln.mSt }}">{{ ln.marker }}</span><span>{{ ln.text }}</span></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isButton }}"><div style="{{ el.btnStyle }}">{{ el.text }}</div></sc-if>
+<sc-if value="{{ el.isShape }}"><div style="{{ el.shapeStyle }}"></div></sc-if>
+<sc-if value="{{ el.isArc }}"><svg viewBox="{{ el.vb }}" preserveAspectRatio="none" style="{{ el.svgStyle }}"><path d="{{ el.d }}" fill="none" stroke="{{ el.stroke }}" strokeWidth="{{ el.sw }}" strokeLinecap="round"></path></svg></sc-if>
+<sc-if value="{{ el.isMotif }}"><svg viewBox="0 0 80 80" style="{{ el.svgStyle }}"><path d="M22 32 Q40 14 58 32" fill="none" stroke="{{ el.stroke }}" strokeWidth="{{ el.sw }}" strokeLinecap="round"></path><path d="M22 48 Q40 66 58 48" fill="none" stroke="{{ el.stroke }}" strokeWidth="{{ el.sw }}" strokeLinecap="round"></path><circle cx="40" cy="40" r="{{ el.sw }}" fill="{{ el.stroke }}"></circle></svg></sc-if>
+<sc-if value="{{ el.isImage }}"><div style="{{ el.boxStyle }}"><sc-if value="{{ el.hasImg }}"><img src="{{ el.src }}" alt="{{ el.alt }}" draggable="false" style="{{ el.imgStyle }}"></sc-if><sc-if value="{{ el.isTile }}"><div style="{{ el.tileStyle }}"></div></sc-if><sc-if value="{{ el.hasOverlay }}"><div style="{{ el.overlayStyle }}"></div></sc-if></div><sc-if value="{{ el.hasCaption }}"><div style="{{ el.capStyle }}">{{ el.caption }}</div></sc-if></sc-if>
+<sc-if value="{{ el.isLogo }}"><img src="{{ el.src }}" alt="Nnọọ" draggable="false" style="{{ el.logoStyle }}"></sc-if>
+<sc-if value="{{ el.isTable }}"><table style="{{ el.tableStyle }}"><tbody><sc-for list="{{ el.rows }}" as="row"><tr><sc-for list="{{ row.cells }}" as="cell"><td style="{{ cell.st }}">{{ cell.t }}</td></sc-for></tr></sc-for></tbody></table></sc-if>
+<sc-if value="{{ el.isChart }}"><div>
+<sc-if value="{{ el.hasTitle }}"><div style="{{ el.titleStyle }}">{{ el.chartTitle }}</div></sc-if>
+<sc-if value="{{ el.isBar }}"><div><div style="{{ el.barsStyle }}"><sc-for list="{{ el.bars }}" as="b"><div style="{{ b.colSt }}"><span style="{{ b.valSt }}">{{ b.value }}</span><div style="{{ b.barSt }}"></div></div></sc-for></div><div style="{{ el.labelsStyle }}"><sc-for list="{{ el.labels }}" as="lb"><span style="{{ lb.st }}">{{ lb.label }}</span></sc-for></div></div></sc-if>
+<sc-if value="{{ el.isHbar }}"><div><sc-for list="{{ el.hbars }}" as="hb"><div style="{{ hb.rowSt }}"><span style="{{ hb.lSt }}">{{ hb.label }}</span><div style="{{ hb.trackSt }}"><div style="{{ hb.fillSt }}"></div></div><span style="{{ hb.vSt }}">{{ hb.value }}</span></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isDonut }}"><div style="{{ el.donutWrap }}"><div style="{{ el.donutStyle }}"></div><div><sc-for list="{{ el.legend }}" as="lg"><div style="{{ lg.rowSt }}"><span style="{{ lg.dotSt }}"></span><span>{{ lg.label }}</span><span style="{{ lg.vSt }}">{{ lg.value }}</span></div></sc-for></div></div></sc-if>
+</div></sc-if>
+<sc-if value="{{ el.isStats }}"><div style="{{ el.gridStyle }}"><sc-for list="{{ el.stats }}" as="st"><div style="{{ st.cellSt }}"><div style="{{ st.vSt }}">{{ st.value }}</div><div style="{{ st.lSt }}">{{ st.label }}</div></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isCols }}"><div style="{{ el.gridStyle }}"><sc-for list="{{ el.cols }}" as="c"><div style="{{ c.cardSt }}"><div style="{{ c.tSt }}">{{ c.title }}</div><sc-if value="{{ c.hasMeta }}"><div style="{{ c.mSt }}">{{ c.meta }}</div></sc-if><div style="{{ c.bSt }}">{{ c.body }}</div></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isEntries }}"><div><sc-for list="{{ el.entries }}" as="en"><div style="{{ en.rowSt }}"><div style="{{ en.headSt }}"><span style="{{ en.tSt }}">{{ en.title }}</span><span style="{{ en.dSt }}">{{ en.date }}</span></div><div style="{{ en.oSt }}">{{ en.org }}</div><div style="{{ en.bSt }}"><sc-for list="{{ en.bullets }}" as="bl"><div style="{{ bl.st }}"><span style="{{ bl.mSt }}">•</span><span>{{ bl.b }}</span></div></sc-for></div></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isTimeline }}"><div style="{{ el.tlStyle }}"><sc-for list="{{ el.tl }}" as="tl"><div style="{{ tl.itemSt }}"><div style="{{ tl.dotSt }}"></div><div><div style="{{ tl.lSt }}">{{ tl.label }}</div><div style="{{ tl.tSt }}">{{ tl.title }}</div><div style="{{ tl.bSt }}">{{ tl.body }}</div></div></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isPeople }}"><div style="{{ el.gridStyle }}"><sc-for list="{{ el.people }}" as="pp"><div style="{{ pp.cardSt }}"><div style="{{ pp.avSt }}"><sc-if value="{{ pp.hasImg }}"><img src="{{ pp.src }}" alt="{{ pp.name }}" style="{{ pp.imgSt }}"></sc-if>{{ pp.ini }}</div><div><div style="{{ pp.nSt }}">{{ pp.name }}</div><div style="{{ pp.rSt }}">{{ pp.role }}</div><sc-if value="{{ pp.hasBody }}"><div style="{{ pp.bSt }}">{{ pp.body }}</div></sc-if></div></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isTags }}"><div style="{{ el.tagsStyle }}"><sc-for list="{{ el.tags }}" as="tg"><span style="{{ tg.st }}">{{ tg.t }}</span></sc-for></div></sc-if>
+<sc-if value="{{ el.isGallery }}"><div style="{{ el.gridStyle }}"><sc-for list="{{ el.gal }}" as="g"><div><div style="{{ g.boxSt }}"><img src="{{ g.src }}" alt="{{ g.caption }}" draggable="false" style="{{ g.imgSt }}"></div><sc-if value="{{ g.hasCap }}"><div style="{{ g.cSt }}">{{ g.caption }}</div></sc-if></div></sc-for></div></sc-if>
+<sc-if value="{{ el.isToc }}"><div><sc-for list="{{ el.toc }}" as="tc"><div style="{{ tc.rowSt }}"><span style="{{ tc.tSt }}">{{ tc.title }}</span><span style="{{ tc.nSt }}">{{ tc.n }}</span></div></sc-for><sc-if value="{{ el.tocEmpty }}"><div style="{{ el.emptySt }}">Mark pages “Include in contents” to list them here.</div></sc-if></div></sc-if>
+<sc-if value="{{ el.isCallout }}"><div style="{{ el.calloutStyle }}"><sc-if value="{{ el.hasCTitle }}"><div style="{{ el.ctSt }}">{{ el.cTitle }}</div></sc-if><div style="{{ el.cbSt }}">{{ el.cBody }}</div></div></sc-if>
+<sc-if value="{{ el.isPagenum }}"><div style="{{ el.textStyle }}">{{ el.text }}</div></sc-if>
+<sc-for list="{{ el.handles }}" as="hd"><div data-ui="1" style="{{ hd.st }}" onPointerDown="{{ hd.down }}"></div></sc-for>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ view.hasHead }}"><div style="{{ view.headStyle }}">{{ view.headText }}</div></sc-if>
+<sc-if value="{{ view.hasNum }}"><div style="{{ view.numStyle }}">{{ view.numText }}</div></sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;view&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;object&quot;}}"></script>
+</body>
+</html>

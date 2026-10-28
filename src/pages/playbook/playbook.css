@@ -1,0 +1,68 @@
+/* Playbook — reuses .sn-layout / .sn-nav from voice.css */
+.pb-pills { display: flex; }
+@media (min-width: 960px) { .pb-pills { display: none; } }
+.pb-pills .pill-row { margin: 0 -20px; padding: 0 20px 2px; }
+@media (min-width: 640px) { .pb-pills .pill-row { margin: 0 -24px; padding: 0 24px 2px; } }
+.pb-pills .pill { text-decoration: none; }
+
+.pb-head { display: flex; flex-direction: column; gap: 14px; }
+.pb-sec { display: flex; flex-direction: column; gap: 18px; padding-top: 12px; border-top: 1px solid var(--border); min-width: 0; }
+.pb-sec:first-of-type { border-top: none; padding-top: 0; }
+.pb-sec-top { display: flex; flex-direction: column; gap: 8px; }
+.pb-more { display: flex; gap: 8px 16px; flex-wrap: wrap; font-size: 14px; font-weight: 600; }
+.pb-more a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+
+/* Mission */
+.pb-mission { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .pb-mission { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); } }
+.pb-name { display: flex; flex-direction: column; gap: 8px; border-left: 4px solid var(--archival-soft); }
+.pb-name-big { font-family: var(--font-display); font-weight: 700; font-size: clamp(44px, 8vw, 72px); line-height: 1; letter-spacing: -0.03em; color: var(--fg); }
+.pb-quote { font-family: var(--font-archive); font-weight: 500; font-size: clamp(20px, 2.6vw, 26px); line-height: 1.25; color: var(--fg); }
+.pb-body { font-size: 16px; line-height: 1.7; color: var(--fg-muted); max-width: 64ch; text-wrap: pretty; }
+
+/* Principles */
+.pb-prin { display: flex; flex-direction: column; gap: 8px; }
+.pb-prin-n { font-family: var(--font-display); font-weight: 700; font-size: 13px; color: var(--brand); }
+.pb-prin p { font-size: 14px; line-height: 1.6; color: var(--fg-muted); }
+
+/* Logos */
+.pb-logo { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.pb-logo-ground { height: 140px; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.pb-logo-ground img { max-width: 80%; display: block; }
+.pb-logo-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 4px; }
+.pb-logo-body strong { font-size: 14px; color: var(--fg); }
+.pb-rules { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); }
+.pb-rule h3 { font-family: var(--font-display); font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.pb-rule p { font-size: 14px; line-height: 1.6; color: var(--fg-muted); }
+.pb-misuse { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--bg-card); }
+.pb-misuse-box { height: 110px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pb-misuse-cap { padding: 10px 12px; font-size: 13px; line-height: 1.45; }
+.pb-misuse-cap strong { color: var(--danger); }
+
+/* Palette */
+.pb-sw { padding: 0; overflow: hidden; display: flex; flex-direction: column; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.pb-sw:hover { box-shadow: var(--shadow-md); }
+.pb-sw-chip { height: 96px; display: flex; align-items: flex-end; padding: 10px 12px; font-family: var(--font-mono); font-size: 12px; }
+.pb-sw-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
+.pb-sw-body strong { font-size: 14px; color: var(--fg); }
+.pb-neutrals .pb-sw-chip { height: 64px; }
+
+/* Type */
+.pb-type { display: flex; flex-direction: column; gap: 10px; }
+.pb-spec { color: var(--fg); overflow-wrap: break-word; }
+.pb-spec.display { font-family: var(--font-display); font-weight: 700; font-size: clamp(32px, 5vw, 44px); line-height: 1.08; letter-spacing: -0.02em; }
+.pb-spec.body { font-family: var(--font-body); font-size: 16px; line-height: 1.7; color: var(--fg-muted); }
+.pb-spec.archive { font-family: var(--font-archive); font-weight: 500; font-size: clamp(22px, 3vw, 28px); line-height: 1.25; }
+.pb-type-meta { display: flex; gap: 6px 12px; flex-wrap: wrap; font-size: 13px; color: var(--fg-subtle); }
+
+/* Do / don't */
+.pb-dd { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .pb-dd { grid-template-columns: 1fr 1fr; } }
+.pb-dd ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pb-dd li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.55; color: var(--fg-muted); }
+.pb-dd li svg { margin-top: 2px; }
+.pb-do h3 { color: var(--success); }
+.pb-dont h3 { color: var(--danger); }
+.pb-dd h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.pb-sw { width: 100%; align-items: stretch; }
+.pb-sw-chip, .pb-sw-body { width: 100%; box-sizing: border-box; }

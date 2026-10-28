@@ -1,0 +1,39 @@
+/* GENERATED from src/lib/tokens.js SEMANTIC + DARK_EXTRA. Regenerate with: npm run gen:dark */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #17110b;
+  --bg-raised: #211810;
+  --bg-card: #2a1f15;
+  --bg-inverse: #faf5ec;
+  --fg: #faf5ec;
+  --fg-muted: #e3d6c2;
+  --fg-subtle: #b8a68d;
+  --fg-disabled: #6b5945;
+  --fg-inverse: #1a120b;
+  --fg-on-clay: #1a120b;
+  --border: #3d2e1f;
+  --border-strong: #5a4632;
+  --border-accent: #e17f47;
+  --brand: #e17f47;
+  --brand-hover: #eca372;
+  --brand-press: #f5c4a1;
+  --brand-soft: #3a1809;
+  --brand-soft-fg: #f5c4a1;
+  --accent: #eebb3a;
+  --accent-soft: #3a2a08;
+  --archival: #6f9778;
+  --archival-soft: #15301d;
+  --community: #a8678a;
+  --community-soft: #2e1022;
+  --success: #6f9778;
+  --warning: #eebb3a;
+  --danger: #e0705f;
+  --info: #a8678a;
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.34);
+  --shadow-md: 0 6px 18px rgba(0,0,0,0.40);
+  --shadow-lg: 0 14px 40px rgba(0,0,0,0.46);
+  --shadow-xl: 0 28px 72px rgba(0,0,0,0.52);
+  --ring: 0 0 0 3px rgba(225,127,71,0.40);
+  --ring-accent: 0 0 0 3px rgba(238,187,58,0.40);
+}

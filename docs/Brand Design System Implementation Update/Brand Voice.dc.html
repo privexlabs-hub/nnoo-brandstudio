@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Voice & knowledge — Nnọọ Brand Studio</title>
+<link rel="stylesheet" href="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/colors_and_type.css">
+<link rel="stylesheet" href="assets/brand/fonts/fonts.css">
+<script src="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/_ds_bundle.js"></script>
+<style>body{margin:0}*{box-sizing:border-box}html{scroll-padding-top:80px}a{color:var(--brand)}a:hover{color:var(--brand-hover)}button:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--bg);color:var(--fg);font-family:var(--font-body)">
+<dc-import name="Nnoo App Header" active="voice" hint-size="100%,61px"></dc-import>
+<div style="{{ gridSt }}">
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><nav aria-label="Sections" style="position:sticky;top:84px;align-self:start;display:flex;flex-direction:column;gap:2px;max-height:calc(100vh - 100px);overflow:auto">
+<div style="font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle);padding:0 10px 8px">On this page</div>
+<sc-for list="{{ sections }}" as="s" hint-placeholder-count="12"><a href="{{ s.href }}" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:10px;font-size:13px;color:var(--fg-muted);text-decoration:none"><span style="{{ s.dot }}"></span>{{ s.title }}</a></sc-for>
+</nav></sc-if>
+<main style="min-width:0;display:flex;flex-direction:column;gap:28px">
+<header style="display:flex;flex-direction:column;gap:14px">
+<div style="font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle)">Voice & knowledge</div>
+<h1 style="font-family:var(--font-display);font-size:clamp(32px,4.5vw,52px);line-height:1.06;letter-spacing:-0.02em;margin:0">Everything a writer — or an AI tool — needs to sound like Nnọọ</h1>
+<p style="margin:0;font-size:17px;line-height:1.65;color:var(--fg-muted);max-width:64ch;text-wrap:pretty">Copy a single section, or the whole document, straight into ChatGPT, Claude or your content calendar. Each section is marked by how certain it is, so nothing unconfirmed is passed off as fact.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button type="button" onClick="{{ copyAll }}" style="height:44px;padding:0 18px;border-radius:12px;border:none;background:var(--brand);color:var(--fg-on-clay);font-family:var(--font-display);font-weight:600;font-size:15px;cursor:pointer">Copy everything</button>
+<sc-for list="{{ downloads }}" as="d" hint-placeholder-count="3"><button type="button" onClick="{{ d.run }}" style="height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--border-strong);background:var(--bg-card);color:var(--fg);font-weight:600;font-size:14px;cursor:pointer">{{ d.label }}</button></sc-for>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--fg-muted)"><sc-for list="{{ legend }}" as="l"><span style="display:flex;align-items:center;gap:8px"><span style="{{ l.dot }}"></span><strong style="color:var(--fg)">{{ l.label }}</strong> {{ l.note }}</span></sc-for></div>
+</header>
+<sc-for list="{{ sections }}" as="s" hint-placeholder-count="4">
+<section id="{{ s.id }}" style="background:var(--bg-card);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+<div style="display:flex;flex-direction:column;gap:6px"><span style="{{ s.badge }}">{{ s.statusLabel }}</span><h2 style="margin:0;font-family:var(--font-display);font-size:24px;letter-spacing:-0.01em">{{ s.title }}</h2></div>
+<button type="button" onClick="{{ s.copy }}" title="{{ s.copyLabel }}" style="height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--border-strong);background:var(--bg);color:var(--fg);font-size:13px;font-weight:600;cursor:pointer;flex:none">Copy section</button>
+</div>
+<sc-for list="{{ s.blocks }}" as="b">
+<div>
+<sc-if value="{{ b.isP }}"><p style="margin:0;font-size:15px;line-height:1.7;color:var(--fg-muted);max-width:72ch;text-wrap:pretty">{{ b.text }}</p></sc-if>
+<sc-if value="{{ b.isUl }}"><ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.6;color:var(--fg-muted)"><sc-for list="{{ b.items }}" as="i"><li>{{ i }}</li></sc-for></ul></sc-if>
+<sc-if value="{{ b.isOl }}"><ol style="margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.6;color:var(--fg-muted)"><sc-for list="{{ b.items }}" as="i"><li>{{ i }}</li></sc-for></ol></sc-if>
+<sc-if value="{{ b.isTable }}"><div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px"><table style="width:100%;border-collapse:collapse;font-size:14px;min-width:480px"><thead><tr><sc-for list="{{ b.head }}" as="h"><th style="text-align:left;padding:10px 12px;background:var(--bg-raised);font-family:var(--font-display);font-weight:600;color:var(--fg);border-bottom:1px solid var(--border)">{{ h }}</th></sc-for></tr></thead><tbody><sc-for list="{{ b.rows }}" as="r"><tr><sc-for list="{{ r }}" as="c"><td style="padding:10px 12px;border-bottom:1px solid var(--border);color:var(--fg-muted);vertical-align:top;line-height:1.5">{{ c }}</td></sc-for></tr></sc-for></tbody></table></div></sc-if>
+</div>
+</sc-for>
+</section>
+</sc-for>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { ready: false, w: window.innerWidth };
+  async componentDidMount() {
+    const u = p => import(new URL(p, location.href).href);
+    [this.V, this.A] = await Promise.all([u('lib/voice.js'), u('lib/app.js')]);
+    this.A.initTheme(); this.setState({ ready: true });
+    this.onR = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this.onR);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onR); }
+  parse(md) {
+    const out = []; const lines = md.split('\n'); let i = 0;
+    while (i < lines.length) {
+      const l = lines[i];
+      if (!l.trim()) { i++; continue; }
+      if (l.startsWith('|')) { const rows = []; while (i < lines.length && lines[i].startsWith('|')) { rows.push(lines[i].split('|').slice(1, -1).map(c => c.trim())); i++; } out.push({ isTable: true, head: rows[0], rows: rows.slice(2) }); continue; }
+      if (/^- /.test(l)) { const items = []; while (i < lines.length && /^- /.test(lines[i])) { items.push(lines[i].slice(2)); i++; } out.push({ isUl: true, items }); continue; }
+      if (/^\d+\. /.test(l)) { const items = []; while (i < lines.length && (/^\d+\. /.test(lines[i]) || /^ {2,}\S/.test(lines[i]))) { if (/^\d+\. /.test(lines[i])) items.push(lines[i].replace(/^\d+\. /, '')); else items[items.length - 1] += ' — ' + lines[i].trim(); i++; } out.push({ isOl: true, items }); continue; }
+      out.push({ isP: true, text: l }); i++;
+    }
+    return out;
+  }
+  html() {
+    const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const body = this.V.VOICE.map(s => `<section><h2>${esc(s.title)}</h2><p class="st">${this.V.STATUS[s.status].label}</p>` + this.parse(s.md).map(b => b.isP ? `<p>${esc(b.text)}</p>` : b.isUl ? '<ul>' + b.items.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : b.isOl ? '<ol>' + b.items.map(x => `<li>${esc(x)}</li>`).join('') + '</ol>' : '<table><tr>' + b.head.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>' + b.rows.map(r => '<tr>' + r.map(c => `<td>${esc(c)}</td>`).join('') + '</tr>').join('') + '</table>').join('') + '</section>').join('\n');
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Nnọọ — brand voice and knowledge</title><style>body{font-family:"DM Sans",system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;color:#1a120b;line-height:1.65;background:#faf5ec}h1,h2{font-family:Outfit,system-ui,sans-serif;letter-spacing:-0.01em}h2{margin-top:2em}.st{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#a7471c}table{border-collapse:collapse;width:100%}th,td{border-bottom:1px solid #d9cfbd;padding:6px 8px;text-align:left;vertical-align:top}</style></head><body><h1>Nnọọ — brand voice and knowledge</h1>${body}</body></html>`;
+  }
+  renderVals() {
+    const wide = this.state.w >= 960;
+    if (!this.state.ready) return { wide, gridSt: { maxWidth: '1200px', margin: '0 auto', padding: '40px 20px 96px', display: 'grid', gridTemplateColumns: wide ? '220px minmax(0,1fr)' : 'minmax(0,1fr)', gap: '40px' }, sections: [], downloads: [], legend: [], copyAll: () => {} };
+    const V = this.V, A = this.A;
+    const tone = { verified: ['var(--archival-soft)', 'var(--archival)'], derived: ['var(--accent-soft)', 'var(--fg)'], confirm: ['var(--brand-soft)', 'var(--brand-soft-fg)'] };
+    const dotC = { verified: 'var(--archival)', derived: 'var(--accent)', confirm: 'var(--brand)' };
+    const dot = st => ({ width: '8px', height: '8px', borderRadius: '50%', background: dotC[st], flex: 'none' });
+    return {
+      wide, gridSt: { maxWidth: '1200px', margin: '0 auto', padding: '40px 20px 96px', display: 'grid', gridTemplateColumns: wide ? '220px minmax(0,1fr)' : 'minmax(0,1fr)', gap: '40px' },
+      legend: Object.entries(V.STATUS).map(([k, v]) => ({ label: v.label, note: '— ' + v.note, dot: dot(k) })),
+      copyAll: () => A.copyText(V.fullText()).catch(() => A.toast('Copy failed — select the text manually.', 'err')),
+      downloads: [['Download .md', () => A.download(new Blob([V.fullText()], { type: 'text/markdown' }), 'nnoo-brand-voice-and-knowledge.md')], ['Download .txt', () => A.download(new Blob([V.fullText().replace(/^#+ /gm, '')], { type: 'text/plain' }), 'nnoo-brand-voice-and-knowledge.txt')], ['Download .html', () => A.download(new Blob([this.html()], { type: 'text/html' }), 'nnoo-brand-voice-and-knowledge.html')]].map(([label, run]) => ({ label, run })),
+      sections: V.VOICE.map(s => ({ id: 'sec-' + s.id, href: '#sec-' + s.id, title: s.title, statusLabel: V.STATUS[s.status].label, dot: dot(s.status), badge: { alignSelf: 'flex-start', fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '4px 10px', borderRadius: '999px', background: tone[s.status][0], color: tone[s.status][1] }, blocks: this.parse(s.md), copy: () => A.copyText(V.sectionText(s)).catch(() => A.toast('Copy failed', 'err')), copyLabel: 'Copy section: ' + s.title }))
+    };
+  }
+}
+</script>
+</body>
+</html>

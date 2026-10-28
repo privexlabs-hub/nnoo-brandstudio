@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Editor — Nnọọ Brand Studio</title>
+<link rel="stylesheet" href="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/colors_and_type.css">
+<link rel="stylesheet" href="assets/brand/fonts/fonts.css">
+<script src="_ds/nn-design-system-a7234bb9-76ef-4ed9-8b21-ece0c69bf52f/_ds_bundle.js"></script>
+<style>html,body{margin:0;height:100%;overflow:hidden}*{box-sizing:border-box}a{color:var(--brand)}a:hover{color:var(--brand-hover)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:none;box-shadow:var(--ring)}@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important}}</style>
+</helmet>
+<div style="height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--fg);font-family:var(--font-body)">
+<dc-import name="Nnoo App Header" active="editor" hint-size="100%,61px"></dc-import>
+
+<sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}"><div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--fg-subtle);font-size:15px">Opening the editor…</div></sc-if>
+
+<sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;overflow:auto;padding:48px 20px">
+<div style="max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:24px">
+<div><div class="eyebrow" style="font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle)">Editor</div><h1 style="font-family:var(--font-display);font-size:36px;margin:8px 0 8px;letter-spacing:-0.02em">Open something to edit</h1><p style="margin:0;color:var(--fg-muted);font-size:16px;line-height:1.6;text-wrap:pretty">{{ emptyMsg }}</p></div>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a href="Template%20Library.dc.html" style="background:var(--brand);color:var(--fg-on-clay);padding:12px 20px;border-radius:12px;font-family:var(--font-display);font-weight:600;text-decoration:none">Choose a template</a></div>
+<sc-if value="{{ hasRecent }}"><div style="display:flex;flex-direction:column;gap:8px"><h2 style="font-family:var(--font-display);font-size:22px;margin:8px 0 4px">Recent documents</h2>
+<sc-for list="{{ recent }}" as="r"><a href="{{ r.href }}" style="display:flex;justify-content:space-between;gap:12px;padding:14px 16px;border:1px solid var(--border);border-radius:12px;background:var(--bg-card);text-decoration:none;color:var(--fg)"><span style="font-weight:600">{{ r.name }}</span><span style="color:var(--fg-subtle);font-size:13px">{{ r.meta }}</span></a></sc-for></div></sc-if>
+</div></div>
+</sc-if>
+
+<sc-if value="{{ ready }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--bg-raised);flex-wrap:wrap;min-height:56px">
+<input aria-label="Document name" value="{{ docName }}" onChange="{{ renameDoc }}" style="font-family:var(--font-display);font-weight:600;font-size:16px;border:1px solid transparent;background:transparent;color:var(--fg);padding:8px 10px;border-radius:10px;min-width:0;width:240px;max-width:30vw">
+<sc-if value="{{ showMeta }}"><span style="font-size:12px;color:var(--fg-subtle);white-space:nowrap">{{ docMeta }}</span></sc-if>
+<span style="{{ saveStyle }}">{{ saveText }}</span>
+<div style="flex:1"></div>
+<div style="display:flex;gap:4px;align-items:center">
+<button type="button" title="Undo (Ctrl/Cmd+Z)" aria-label="Undo" onClick="{{ undo }}" disabled="{{ noUndo }}" style="{{ iconBtn }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></button>
+<button type="button" title="Redo (Shift+Ctrl/Cmd+Z)" aria-label="Redo" onClick="{{ redo }}" disabled="{{ noRedo }}" style="{{ iconBtn }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13"></path></svg></button>
+</div>
+<div style="display:flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:12px;padding:2px;background:var(--bg-card)">
+<button type="button" aria-label="Zoom out" onClick="{{ zoomOut }}" style="{{ iconBtnSm }}">−</button>
+<button type="button" onClick="{{ zoomFit }}" title="Fit to screen" style="{{ zoomLabelSt }}">{{ zoomLabel }}</button>
+<button type="button" aria-label="Zoom in" onClick="{{ zoomIn }}" style="{{ iconBtnSm }}">+</button>
+</div>
+<button type="button" onClick="{{ togglePreview }}" aria-pressed="{{ preview }}" style="{{ previewBtnSt }}">{{ previewLabel }}</button>
+<button type="button" onClick="{{ openExport }}" style="background:var(--brand);color:var(--fg-on-clay);border:none;border-radius:12px;padding:0 16px;height:40px;font-family:var(--font-display);font-weight:600;font-size:14px;cursor:pointer">Export</button>
+</div>
+
+<div style="{{ workStyle }}">
+<sc-if value="{{ showNav }}">
+<aside aria-label="Pages" style="{{ navStyle }}">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 12px 8px;gap:8px"><span style="font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle)">{{ navTitle }}</span>
+<div style="display:flex;gap:6px"><sc-if value="{{ isBook }}"><button type="button" onClick="{{ addChapter }}" style="{{ smallBtn }}">+ Chapter</button></sc-if><button type="button" onClick="{{ openAddPage }}" style="{{ smallBtnBrand }}">{{ addPageLabel }}</button></div></div>
+<div style="flex:1;overflow:auto;padding:0 8px 16px" ref="{{ navRef }}">
+<sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+<div>
+<sc-if value="{{ n.hasSection }}"><button type="button" onClick="{{ n.toggleSection }}" style="display:flex;align-items:center;gap:6px;width:100%;background:none;border:none;color:var(--fg-subtle);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:12px 6px 6px;cursor:pointer;text-align:left"><span>{{ n.caret }}</span><span>{{ n.section }}</span></button></sc-if>
+<sc-if value="{{ n.visible }}">
+<div data-nav-pid="{{ n.pid }}" draggable="true" onDragStart="{{ n.dragStart }}" onDragOver="{{ n.dragOver }}" onDrop="{{ n.drop }}" onDragEnd="{{ n.dragEnd }}" onClick="{{ n.select }}" style="{{ n.st }}">
+<div style="{{ n.thumbBox }}"><sc-if value="{{ n.live }}"><dc-import name="Nnoo Page" view="{{ n.thumb }}" hint-size="56px,56px"></dc-import></sc-if><sc-if value="{{ n.ghost }}"><div style="{{ n.ghostSt }}"></div></sc-if></div>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;gap:6px;align-items:baseline"><span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--fg-subtle)">{{ n.num }}</span><span style="font-size:13px;font-weight:600;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ n.name }}</span></div>
+<sc-if value="{{ n.warn }}"><span style="font-size:11px;color:var(--danger);font-weight:600">Overflows page</span></sc-if>
+<sc-if value="{{ n.isSel }}"><div style="display:flex;gap:2px;margin-top:4px;flex-wrap:wrap">
+<button type="button" title="Move up" aria-label="Move page up" onClick="{{ n.up }}" style="{{ microBtn }}">↑</button>
+<button type="button" title="Move down" aria-label="Move page down" onClick="{{ n.down }}" style="{{ microBtn }}">↓</button>
+<button type="button" title="Insert page before" onClick="{{ n.insBefore }}" style="{{ microBtn }}">+↑</button>
+<button type="button" title="Insert page after" onClick="{{ n.insAfter }}" style="{{ microBtn }}">+↓</button>
+<button type="button" title="Duplicate page" onClick="{{ n.dup }}" style="{{ microBtn }}">⧉</button>
+<button type="button" title="Delete page" aria-label="Delete page" onClick="{{ n.del }}" style="{{ microBtnDanger }}">✕</button>
+</div></sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ showCanvas }}">
+<main aria-label="Canvas" ref="{{ canvasRef }}" onPointerDown="{{ canvasDown }}" onScroll="{{ canvasScroll }}" style="{{ canvasStyle }}">
+<div style="{{ canvasInner }}">
+<sc-for list="{{ canvasPages }}" as="pg" hint-placeholder-count="1">
+<div data-page-wrap="{{ pg.pid }}" style="{{ pg.wrapStyle }}">
+<sc-if value="{{ pg.showLabel }}"><div data-ui="1" style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--fg-subtle);min-height:24px"><span style="{{ pg.labelSt }}">{{ pg.label }}</span>
+<sc-if value="{{ pg.warn }}"><span style="display:flex;gap:8px;align-items:center"><span style="color:var(--danger);font-weight:600">Content overflows this page</span><button type="button" onClick="{{ pg.flowOver }}" style="border:1px solid var(--danger);background:var(--bg-card);color:var(--danger);border-radius:8px;padding:3px 8px;font-size:12px;cursor:pointer">Move overflow to new page</button></span></sc-if>
+</div></sc-if>
+<div style="position:relative">
+<sc-if value="{{ pg.live }}"><dc-import name="Nnoo Page" view="{{ pg.view }}" hint-size="300px,300px"></dc-import></sc-if><sc-if value="{{ pg.ghost }}"><div style="{{ pg.ghostSt }}"></div></sc-if>
+<sc-for list="{{ pg.guides }}" as="gd"><div data-ui="1" style="{{ gd.st }}"></div></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</main>
+</sc-if>
+
+<sc-if value="{{ showInsp }}">
+<aside aria-label="Properties" style="{{ inspStyle }}">
+<div style="display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--border)">
+<sc-for list="{{ inspTabs }}" as="t"><button type="button" onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="{{ t.st }}">{{ t.label }}</button></sc-for>
+</div>
+<div style="flex:1;overflow:auto;padding:12px 14px 40px;display:flex;flex-direction:column;gap:18px">
+<sc-for list="{{ sections }}" as="sec" hint-placeholder-count="2">
+<section style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--fg)">{{ sec.title }}</h3><span style="font-size:11px;color:var(--fg-subtle)">{{ sec.hint }}</span></div>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+<sc-for list="{{ sec.fields }}" as="f">
+<div style="{{ f.cell }}">
+<sc-if value="{{ f.hasLabel }}"><label style="display:block;font-size:12px;color:var(--fg-subtle);margin-bottom:4px;font-weight:500">{{ f.label }}</label></sc-if>
+<sc-if value="{{ f.isText }}"><input type="text" value="{{ f.value }}" onChange="{{ f.change }}" onFocus="{{ f.focus }}" placeholder="{{ f.ph }}" title="{{ f.label }}" style="{{ inputSt }}"></sc-if>
+<sc-if value="{{ f.isNumber }}"><input type="number" value="{{ f.value }}" step="{{ f.step }}" min="{{ f.min }}" max="{{ f.max }}" onChange="{{ f.change }}" onFocus="{{ f.focus }}" title="{{ f.label }}" style="{{ inputSt }}"></sc-if>
+<sc-if value="{{ f.isArea }}"><textarea value="{{ f.value }}" onChange="{{ f.change }}" onFocus="{{ f.focus }}" rows="{{ f.rows }}" title="{{ f.label }}" placeholder="{{ f.ph }}" style="{{ areaSt }}"></textarea></sc-if>
+<sc-if value="{{ f.isSelect }}"><select value="{{ f.value }}" onChange="{{ f.change }}" title="{{ f.label }}" style="{{ inputSt }}"><sc-for list="{{ f.options }}" as="op"><option value="{{ op.v }}" selected="{{ op.sel }}">{{ op.l }}</option></sc-for></select></sc-if>
+<sc-if value="{{ f.isSeg }}"><div role="group" title="{{ f.label }}" style="display:flex;gap:2px;background:var(--bg-raised);border:1px solid var(--border);border-radius:10px;padding:2px"><sc-for list="{{ f.options }}" as="op"><button type="button" title="{{ op.l }}" aria-pressed="{{ op.on }}" onClick="{{ op.pick }}" style="{{ op.st }}">{{ op.l }}</button></sc-for></div></sc-if>
+<sc-if value="{{ f.isToggle }}"><button type="button" role="switch" aria-checked="{{ f.on }}" onClick="{{ f.toggle }}" style="display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--fg);font-size:13px;cursor:pointer;padding:6px 0;text-align:left;min-height:36px"><span style="{{ f.trackSt }}"><span style="{{ f.knobSt }}"></span></span><span>{{ f.text }}</span></button></sc-if>
+<sc-if value="{{ f.isColor }}"><div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;flex-wrap:wrap;gap:5px"><sc-for list="{{ f.swatches }}" as="sw"><button type="button" title="{{ sw.name }}" aria-pressed="{{ sw.on }}" onClick="{{ sw.pick }}" style="{{ sw.st }}"></button></sc-for></div><input type="text" value="{{ f.value }}" onChange="{{ f.change }}" aria-label="{{ f.label }} value" placeholder="token or #hex" style="{{ inputSt }}"></div></sc-if>
+<sc-if value="{{ f.isRange }}"><div style="display:flex;align-items:center;gap:8px"><input type="range" value="{{ f.value }}" min="{{ f.min }}" max="{{ f.max }}" step="{{ f.step }}" onChange="{{ f.change }}" onPointerDown="{{ f.focus }}" title="{{ f.label }}" style="flex:1;accent-color:var(--brand)"><span style="font-size:12px;color:var(--fg-muted);min-width:36px;text-align:right">{{ f.display }}</span></div></sc-if>
+<sc-if value="{{ f.isActions }}"><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ f.actions }}" as="ac"><button type="button" onClick="{{ ac.run }}" disabled="{{ ac.disabled }}" title="{{ ac.title }}" style="{{ ac.st }}">{{ ac.label }}</button></sc-for></div></sc-if>
+<sc-if value="{{ f.isFile }}"><label style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border:1.5px dashed var(--border-strong);border-radius:12px;font-size:13px;font-weight:600;color:var(--fg-muted);cursor:pointer;background:var(--bg-card)">{{ f.text }}<input type="file" accept="{{ f.accept }}" onChange="{{ f.change }}" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></label></sc-if>
+<sc-if value="{{ f.isNote }}"><p style="{{ f.noteSt }}">{{ f.text }}</p></sc-if>
+<sc-if value="{{ f.isLayers }}"><div style="display:flex;flex-direction:column;gap:2px;border:1px solid var(--border);border-radius:12px;padding:4px;background:var(--bg-card)"><sc-for list="{{ f.layers }}" as="ly"><div style="{{ ly.st }}"><button type="button" onClick="{{ ly.select }}" style="flex:1;min-width:0;text-align:left;background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:6px 4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-subtle);margin-right:6px">{{ ly.type }}</span>{{ ly.name }}</button><button type="button" aria-label="Move layer up" onClick="{{ ly.up }}" style="{{ microBtn }}">↑</button><button type="button" aria-label="Move layer down" onClick="{{ ly.down }}" style="{{ microBtn }}">↓</button><button type="button" title="{{ ly.visLabel }}" onClick="{{ ly.vis }}" style="{{ microBtn }}">{{ ly.visIcon }}</button></div></sc-for><sc-if value="{{ f.noLayers }}"><p style="margin:6px;font-size:12px;color:var(--fg-subtle)">No elements on this page yet.</p></sc-if></div></sc-if>
+<sc-if value="{{ f.isGallery }}"><div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ f.items }}" as="gi"><div style="display:flex;gap:8px;align-items:center"><img src="{{ gi.src }}" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none;background:var(--sand)"><input type="text" value="{{ gi.caption }}" onChange="{{ gi.change }}" aria-label="Caption" placeholder="Caption" style="{{ inputSt }}"><label style="{{ microBtnLabel }}">↺<input type="file" accept="image/*" onChange="{{ gi.replace }}" style="position:absolute;width:1px;height:1px;opacity:0"></label><button type="button" aria-label="Remove image" onClick="{{ gi.remove }}" style="{{ microBtnDanger }}">✕</button></div></sc-for></div></sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+</div>
+</aside>
+</sc-if>
+</div>
+
+<sc-if value="{{ mobileTabs }}"><nav aria-label="Editor panels" style="display:flex;border-top:1px solid var(--border);background:var(--bg);padding-bottom:env(safe-area-inset-bottom)"><sc-for list="{{ mtabs }}" as="t"><button type="button" onClick="{{ t.pick }}" aria-pressed="{{ t.on }}" style="{{ t.st }}">{{ t.label }}</button></sc-for></nav></sc-if>
+</sc-if>
+
+<sc-if value="{{ addOpen }}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-modal="true" title="{{ addTitle }}" onClick="{{ closeAdd }}" style="position:fixed;inset:0;background:rgba(26,18,11,0.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px">
+<div onClick="{{ stop }}" style="background:var(--bg-card);color:var(--fg);border-radius:24px;box-shadow:var(--shadow-xl);width:min(720px,100%);max-height:calc(100vh - 40px);display:flex;flex-direction:column;overflow:hidden">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px 12px;gap:12px"><div><h2 style="margin:0;font-family:var(--font-display);font-size:22px">{{ addTitle }}</h2><p style="margin:4px 0 0;font-size:13px;color:var(--fg-subtle)">{{ addSub }}</p></div><button type="button" aria-label="Close" onClick="{{ closeAdd }}" style="{{ iconBtn }}">✕</button></div>
+<div style="overflow:auto;padding:4px 24px 24px;display:flex;flex-direction:column;gap:16px">
+<sc-for list="{{ addGroups }}" as="g"><div><div style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:8px">{{ g.title }}</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"><sc-for list="{{ g.items }}" as="it"><button type="button" onClick="{{ it.run }}" style="text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--fg);font-size:13px;font-weight:500;cursor:pointer;min-height:44px">{{ it.label }}</button></sc-for></div></div></sc-for>
+</div></div></div>
+</sc-if>
+
+<sc-if value="{{ exportOpen }}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-modal="true" aria-label="Export" onClick="{{ closeExport }}" style="position:fixed;inset:0;background:rgba(26,18,11,0.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px">
+<div onClick="{{ stop }}" style="background:var(--bg-card);color:var(--fg);border-radius:24px;box-shadow:var(--shadow-xl);width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div><h2 style="margin:0;font-family:var(--font-display);font-size:22px">Export</h2><p style="margin:4px 0 0;font-size:13px;color:var(--fg-subtle)">Exports use your current edits.</p></div><button type="button" aria-label="Close" onClick="{{ closeExport }}" style="{{ iconBtn }}">✕</button></div>
+<div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:600;color:var(--fg-subtle)">File format</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"><sc-for list="{{ exFormats }}" as="x"><button type="button" onClick="{{ x.pick }}" aria-pressed="{{ x.on }}" style="{{ x.st }}"><span style="font-family:var(--font-display);font-weight:600;font-size:14px">{{ x.label }}</span><span style="font-size:11px;color:var(--fg-subtle);line-height:1.35">{{ x.desc }}</span></button></sc-for></div></div>
+<sc-if value="{{ exShowScope }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Page range</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ exScopes }}" as="x"><button type="button" onClick="{{ x.pick }}" aria-pressed="{{ x.on }}" style="{{ x.st }}">{{ x.label }}</button></sc-for></div></div></sc-if>
+<sc-if value="{{ exShowScale }}"><div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Resolution</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ exScales }}" as="x"><button type="button" onClick="{{ x.pick }}" aria-pressed="{{ x.on }}" style="{{ x.st }}">{{ x.label }}</button></sc-for></div></div></sc-if>
+<sc-if value="{{ exShowQuality }}"><div style="display:flex;align-items:center;gap:12px"><label style="font-size:12px;font-weight:600;color:var(--fg-subtle)">Quality</label><input type="range" min="0.5" max="1" step="0.01" value="{{ exQuality }}" onChange="{{ setQuality }}" style="flex:1;accent-color:var(--brand)"><span style="font-size:13px;min-width:40px">{{ exQualityPct }}</span></div></sc-if>
+<p style="margin:0;font-size:13px;color:var(--fg-muted);line-height:1.5;background:var(--bg-raised);border-radius:12px;padding:12px 14px">{{ exSummary }}</p>
+<sc-if value="{{ exHasMsg }}"><p role="status" style="{{ exMsgSt }}">{{ exMsg }}</p></sc-if>
+<div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" onClick="{{ closeExport }}" style="{{ ghostBtn }}">Close</button><button type="button" onClick="{{ runExport }}" disabled="{{ exBusy }}" style="{{ exBtnSt }}">{{ exBtnLabel }}</button></div>
+</div></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { loading: true, doc: null, sel: null, pageIdx: 0, editing: null, zoom: 'fit', hist: [], fut: [], cw: 900, ch: 700, w: window.innerWidth, mpanel: 'canvas', preview: false, tab: 'page', add: null, ex: null, saveState: 'saved', overflow: {}, guides: null, collapsed: {}, drag: null, emptyMsg: '' };
+
+  async componentDidMount() {
+    try {
+      const u = p => import(new URL(p, location.href).href);
+      [this.T, this.TK, this.R, this.S, this.A, this.X] = await Promise.all([u('lib/templates.js'), u('lib/tokens.js'), u('lib/render.js'), u('lib/store.js'), u('lib/app.js'), u('lib/export.js')]);
+      this.A.initTheme();
+      this.byId = this.T.TEMPLATE_BY_ID();
+      this.load();
+    } catch (e) { console.error(e); this.setState({ loading: false, emptyMsg: 'The editor could not load: ' + e.message }); }
+    this.onResize = () => { this.setState({ w: window.innerWidth }); this.measure(); };
+    window.addEventListener('resize', this.onResize);
+    this.onKey = e => this.key(e); window.addEventListener('keydown', this.onKey);
+    this.onHash = () => { const h = this.A.hashParams(); if (h.template || (h.doc && (!this.state.doc || h.doc !== this.state.doc.id))) this.load(); };
+    window.addEventListener('hashchange', this.onHash);
+    this.ro = new ResizeObserver(() => this.measure());
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('keydown', this.onKey); window.removeEventListener('hashchange', this.onHash); this.ro && this.ro.disconnect(); }
+
+  load() {
+    const h = this.A.hashParams(); let doc = null;
+    if (h.template && this.byId[h.template]) {
+      doc = this.T.newDocFromTemplate(this.byId[h.template], h.format);
+      if (h.title || h.subtitle) { doc.content = { ...(doc.content || {}), ...(h.title ? { title: h.title } : {}), ...(h.subtitle ? { body: h.subtitle } : {}) }; doc = this.T.relayoutGraphic(doc, this.byId[h.template], {}); if (h.title) doc.name = h.title.slice(0, 60); }
+      try { this.S.saveDoc(doc); } catch (e) { this.A.toast(e.message, 'err'); }
+      this.A.setHash({ doc: doc.id });
+    } else if (h.doc) {
+      doc = this.S.getDoc(h.doc);
+      if (!doc) { this.setState({ loading: false, doc: null, emptyMsg: 'That document is not in this browser. Documents are stored locally — open it on the device where it was made, or import its project file from the Template Library.' }); return; }
+    }
+    if (!doc) { this.setState({ loading: false, doc: null, emptyMsg: 'Pick a template to start a new document, or reopen a recent one. Everything you make is saved in this browser.' }); return; }
+    const pageIdx = Math.max(0, Math.min(doc.pages.length - 1, (parseInt(h.page, 10) || 1) - 1));
+    this.setState({ loading: false, doc, pageIdx, sel: null, hist: [], fut: [], zoom: 'fit' }, () => { this.measure(); setTimeout(() => this.center(pageIdx, false), 60); });
+  }
+
+  // ---------- virtualised rendering ----------
+  onScrollCanvas() {
+    if (this.raf) return; this.raf = requestAnimationFrame(() => {
+      this.raf = null; const c = this.canvasEl, d = this.state.doc; if (!c || !d) return;
+      const top = c.scrollTop - c.clientHeight * 0.75, bot = c.scrollTop + c.clientHeight * 1.75; let from = null, to = null;
+      c.querySelectorAll('[data-page-wrap]').forEach((w, i) => { const y = w.offsetTop, h = w.offsetHeight; if (y + h >= top && y <= bot) { if (from == null) from = i; to = i; } });
+      if (from == null) return; const v = this.state.vis;
+      if (!v || v.from !== from || v.to !== to) this.setState({ vis: { from, to } });
+    });
+  }
+  isLive(i) { const s = this.state; if (s.renderAll || i === s.pageIdx) return true; const v = s.vis || { from: s.pageIdx - 2, to: s.pageIdx + 2 }; return i >= v.from - 1 && i <= v.to + 1; }
+  // ---------- layout helpers ----------
+  measure() {
+    const c = this.canvasEl; if (!c) return;
+    if (this.ro && !this.observed) { this.ro.observe(c); this.observed = c; }
+    const cw = c.clientWidth, ch = c.clientHeight;
+    if (Math.abs(cw - this.state.cw) > 2 || Math.abs(ch - this.state.ch) > 2) { this.setState({ cw, ch }, () => { clearTimeout(this.rc); this.rc = setTimeout(() => this.center(this.state.pageIdx, false), 80); }); }
+  }
+  fitZoom() {
+    const d = this.state.doc; if (!d) return 1;
+    const pad = this.state.w < 640 ? 32 : 96;
+    const zw = (this.state.cw - pad) / d.w;
+    const zh = (this.state.ch - 96) / d.h;
+    const k = d.kind === 'graphic' ? Math.min(zw, zh) : Math.min(zw, d.docKind === 'presentation' ? zh : 1.4);
+    return Math.max(0.05, Math.min(k, 2));
+  }
+  zoom() { return this.state.zoom === 'fit' ? this.fitZoom() : this.state.zoom; }
+  center(i, smooth = true, tries = 0) {
+    const c = this.canvasEl, d = this.state.doc; if (!c || !d || !d.pages[i]) return;
+    const el = c.querySelector(`[data-page-wrap="${d.pages[i].id}"]`);
+    const pageOuter = el && el.querySelector('[data-page-outer]');
+    if (!el || !pageOuter || pageOuter.offsetHeight < 4 || c.scrollHeight <= c.clientHeight && i > 0 && tries < 1) { if (tries < 15) setTimeout(() => this.center(i, smooth, tries + 1), 80); return; }
+    const cr = c.getBoundingClientRect(), er = el.getBoundingClientRect();
+    const top = er.top - cr.top + c.scrollTop, left = er.left - cr.left + c.scrollLeft;
+    const ty = er.height + 24 < c.clientHeight ? top + er.height / 2 - c.clientHeight / 2 : top - 24;
+    const tx = er.width < c.clientWidth ? left + er.width / 2 - c.clientWidth / 2 : left - 24;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    c.scrollTo({ top: Math.max(0, ty), left: Math.max(0, tx), behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    const n = this.navEl && this.navEl.querySelector(`[data-nav-pid="${d.pages[i].id}"]`);
+    if (n && this.navEl) { const nr = n.getBoundingClientRect(), pr = this.navEl.getBoundingClientRect(); if (nr.top < pr.top || nr.bottom > pr.bottom) this.navEl.scrollTop += nr.top - pr.top - pr.height / 2 + nr.height / 2; }
+  }
+  selectPage(i, opts = {}) {
+    const d = this.state.doc; if (!d) return; i = Math.max(0, Math.min(d.pages.length - 1, i));
+    const sec = d.pages[i].section; const collapsed = { ...this.state.collapsed }; if (sec) delete collapsed[sec];
+    this.setState({ pageIdx: i, sel: opts.keepSel ? this.state.sel : null, editing: null, tab: opts.keepSel ? this.state.tab : 'page', collapsed, mpanel: opts.toCanvas && this.state.w < 1024 ? 'canvas' : this.state.mpanel }, () => { this.A.setHash({ doc: d.id, page: i + 1 }); requestAnimationFrame(() => this.center(i, opts.smooth !== false)); });
+  }
+
+  // ---------- state mutation ----------
+  snap() { return JSON.stringify(this.state.doc); }
+  pushHist(key) {
+    const now = Date.now();
+    if (key && this.lastKey === key && now - this.lastT < 1500) { this.lastT = now; return; }
+    this.lastKey = key; this.lastT = now;
+    const hist = this.state.hist.concat([this.snap()]).slice(-60);
+    this.setState({ hist, fut: [] });
+  }
+  commit(fn, opts = {}) {
+    if (!this.state.doc) return;
+    this.pushHist(opts.key);
+    const doc = JSON.parse(this.snap()); const r = fn(doc); doc.updated = Date.now();
+    this.setState({ doc, ...(opts.state || {}) }, () => { this.save(); opts.after && opts.after(r); });
+    return r;
+  }
+  raw(fn) { const doc = { ...this.state.doc, pages: this.state.doc.pages.slice() }; fn(doc); this.setState({ doc }); }
+  save() {
+    clearTimeout(this.st); this.setState({ saveState: 'saving' });
+    this.st = setTimeout(() => { try { this.S.saveDoc(this.state.doc); this.setState({ saveState: 'saved' }); } catch (e) { this.setState({ saveState: 'error' }); this.A.toast(e.message, 'err'); } }, 350);
+  }
+  undo() { const h = this.state.hist; if (!h.length) return; const prev = h[h.length - 1]; this.setState({ hist: h.slice(0, -1), fut: [this.snap()].concat(this.state.fut), doc: JSON.parse(prev), editing: null }, () => { this.fixSel(); this.save(); }); }
+  redo() { const f = this.state.fut; if (!f.length) return; this.setState({ fut: f.slice(1), hist: this.state.hist.concat([this.snap()]), doc: JSON.parse(f[0]), editing: null }, () => { this.fixSel(); this.save(); }); }
+  fixSel() { const d = this.state.doc; const pi = Math.min(this.state.pageIdx, d.pages.length - 1); const ok = this.state.sel && d.pages.some(p => p.elements.some(e => e.id === this.state.sel)); this.setState({ pageIdx: pi, sel: ok ? this.state.sel : null }); }
+  find(doc, id) { for (let pi = 0; pi < doc.pages.length; pi++) { const ei = doc.pages[pi].elements.findIndex(e => e.id === id); if (ei >= 0) return { pi, ei, el: doc.pages[pi].elements[ei], page: doc.pages[pi] }; } return null; }
+  setEl(patch, key) { const id = this.state.sel; this.commit(doc => { const f = this.find(doc, id); if (!f) return; Object.assign(f.el, patch); if (f.el.slot && patch.text != null) { doc.content = doc.content || {}; doc.content[f.el.slot] = patch.text; } }, { key: key ? id + key : null }); }
+  setPage(patch, key) { const i = this.state.pageIdx; this.commit(doc => { Object.assign(doc.pages[i], patch); }, { key: key ? 'p' + i + key : null }); }
+  setDoc(patch, key) { this.commit(doc => { Object.assign(doc, patch); }, { key: key ? 'd' + key : null }); }
+
+  // ---------- pages ----------
+  template() { return this.byId[this.state.doc.templateId]; }
+  insertPage(page, at) { this.commit(doc => { doc.pages.splice(at, 0, page); }, { state: { add: null }, after: () => this.selectPage(at) }); }
+  dupPage(i) { this.commit(doc => { const p = JSON.parse(JSON.stringify(doc.pages[i])); p.id = this.T.uid('p'); p.name = p.name + ' (copy)'; p.user = true; p.elements.forEach(e => { e.id = this.T.uid(); if (e.slot) { e.slot = null; e.user = true; } }); doc.pages.splice(i + 1, 0, p); }, { after: () => this.selectPage(i + 1) }); }
+  delPage(i) { const d = this.state.doc; if (d.pages.length <= 1) { this.A.toast('A document needs at least one page.', 'err'); return; } if (!confirm('Delete page ' + (i + 1) + ' — “' + d.pages[i].name + '”? You can undo this.')) return; this.commit(doc => { doc.pages.splice(i, 1); }, { after: () => this.selectPage(Math.min(i, this.state.doc.pages.length - 1)) }); }
+  movePage(from, to) { const d = this.state.doc; if (to < 0 || to >= d.pages.length || from === to) return; this.commit(doc => { const [p] = doc.pages.splice(from, 1); doc.pages.splice(to, 0, p); }, { after: () => this.selectPage(to) }); }
+  blankPage() { const d = this.state.doc, cur = d.pages[this.state.pageIdx]; return { id: this.T.uid('p'), name: 'Blank page', kind: 'blank', layout: cur.layout, bg: cur.bg, pad: cur.pad ? cur.pad.slice() : undefined, justify: 'start', showNum: cur.showNum, runHead: '', h: cur.h || null, elements: [], user: true }; }
+  addChapter() {
+    const d = this.state.doc; const n = d.pages.filter(p => p.kind === 'chapter').length + 1;
+    let at = this.state.pageIdx + 1; const sec = d.pages[this.state.pageIdx].section;
+    if (sec) { while (at < d.pages.length && d.pages[at].section === sec && d.pages[at].kind !== 'chapter' && d.pages[at].kind !== 'part') at++; }
+    const ch = this.T.makePage('ebook', 'chapter', n); const body = this.T.makePage('ebook', 'body'); body.section = ch.section; body.runHead = ch.runHead;
+    this.commit(doc => { doc.pages.splice(at, 0, ch, body); }, { after: () => this.selectPage(at) });
+  }
+  flowOverflow(i) {
+    const c = this.canvasEl; const d = this.state.doc; const p = d.pages[i]; const root = c && c.querySelector(`[data-page-root="${p.id}"]`); if (!root) return;
+    const cont = root.children[root.children.length - 1 - (root.querySelectorAll(':scope > div').length - 1)] && root.querySelector(':scope > div:not([style*="background-image"])');
+    const z = this.zoom(); const rr = root.getBoundingClientRect(); const limit = (p.h || d.h) - (p.pad ? p.pad[2] : 0);
+    const move = p.elements.filter(e => { const n = root.querySelector(`[data-el-id="${e.id}"]`); if (!n) return false; const b = n.getBoundingClientRect(); return (b.bottom - rr.top) / z > limit + 1; }).map(e => e.id);
+    if (!move.length) return;
+    this.commit(doc => { const pg = doc.pages[i]; const np = { ...JSON.parse(JSON.stringify(pg)), id: this.T.uid('p'), name: pg.name + ' (cont.)', kind: 'body', toc: false, user: true, justify: 'start' }; np.elements = pg.elements.filter(e => move.includes(e.id)); if (np.elements[0]) np.elements[0].mt = 0; pg.elements = pg.elements.filter(e => !move.includes(e.id)); doc.pages.splice(i + 1, 0, np); }, { after: () => this.selectPage(i + 1) });
+  }
+
+  // ---------- elements ----------
+  sz() { const d = this.state.doc; return d.kind === 'graphic' ? Math.min(d.w, d.h) / 1080 : 1; }
+  newElement(kind, opt) {
+    const d = this.state.doc, T = this.T, pi = this.state.pageIdx, p = d.pages[pi];
+    let els;
+    if (p.layout === 'flow') {
+      const dk = d.docKind || 'report';
+      if (kind === 'logo-variant') els = [T.logo(opt, { w: d.w * 0.18, h: d.w * 0.18 / (this.TK.LOGO_RATIO[opt] || 1) })];
+      else if (kind === 'upload') els = [T.img(null, opt, { h: d.w * 0.4, radius: 8 })];
+      else els = T.makeBlock(dk, kind);
+    } else {
+      const s = this.sz(), W = d.w, H = p.h || d.h, cx = (w, h) => ({ x: (W - w) / 2, y: (H - h) / 2, w, h });
+      const pal = T.PAL[d.palette] || T.PAL.bone;
+      const text = (role, t, size, o = {}) => { const e = T.txt(null, t, { role, size: size * s, color: pal.fg, font: role === 'title' || role === 'h2' ? 'display' : role === 'quote' ? 'archive' : 'body', weight: role === 'title' || role === 'h2' ? 700 : role === 'eyebrow' ? 600 : 400, upper: role === 'eyebrow', ls: role === 'eyebrow' ? 0.12 : role === 'title' ? -0.02 : 0, lh: role === 'body' ? 1.45 : 1.15, ...o }); const w = Math.min(W * 0.8, 900 * s); return Object.assign(e, cx(w, T.estH(e, w))); };
+      const box = (w, h) => cx(w * s, h * s);
+      const map = {
+        heading: () => text('title', 'New heading', 72), subheading: () => text('h2', 'Subheading', 44), paragraph: () => text('body', 'New paragraph text.', 30, { color: pal.muted }), eyebrow: () => text('eyebrow', 'Label', 24, { color: pal.accent }),
+        bullets: () => text('body', 'First point\nSecond point\nThird point', 32, { list: 'bullet' }), numbered: () => text('body', 'First step\nSecond step\nThird step', 32, { list: 'number' }),
+        'pull-quote': () => text('quote', '“A quote goes here.”', 52), button: () => Object.assign(T.btn(null, 'Call to action', { size: 28 * s, fill: pal.btn, color: pal.btnFg, radius: 20 * s }), box(380, 92)),
+        rect: () => Object.assign(T.shape('rect', { fill: pal.soft, radius: 24 * s }), box(400, 260)), ellipse: () => Object.assign(T.shape('ellipse', { fill: pal.accent }), box(260, 260)), line: () => Object.assign(T.shape('rect', { fill: pal.line }), box(500, 6)),
+        arcs: () => Object.assign(T.shape('arc-top', { fill: null, stroke: pal.line, strokeW: 14 * s }), box(500, 250)), motif: () => Object.assign(T.shape('motif', { fill: null, stroke: pal.line, strokeW: 24 * s }), box(500, 500)),
+        image: () => Object.assign(T.img(null, T.IMG.warm, { radius: 24 * s }), box(600, 450)), upload: () => Object.assign(T.img(null, opt, { radius: 24 * s }), box(600, 450)),
+        'logo-variant': () => { const r = this.TK.LOGO_RATIO[opt] || 1; const w = (r > 1 ? 360 : 160) * s; return Object.assign(T.logo(opt), cx(w, w / r)); },
+        pattern: () => T.img(null, T.IMG.pattern, { x: 0, y: 0, w: W, h: H, fit: 'tile', tile: 40 * Math.max(1, s * 2), name: 'Rhythm pattern' }),
+        wave: () => Object.assign(T.img(null, T.IMG.wave, { fit: 'contain' }), box(500, 100)),
+        pagenum: () => Object.assign(T.data('pagenum', [], { size: 24 * s, color: pal.muted, align: 'center' }), box(200, 40)),
+        table: () => Object.assign(T.data('table', [['Column', 'Column'], ['Value', 'Value'], ['Value', 'Value']], { size: 26 * s }), box(700, 260)),
+        'chart-bar': () => Object.assign(T.data('chart', [{ label: 'A', value: 10 }, { label: 'B', value: 18 }, { label: 'C', value: 14 }], { chart: 'bar', size: 24 * s, h: 360 * s, color: pal.accent === 'marigold-200' ? 'marigold-200' : 'clay-500', title: 'Sample data — replace' }), box(700, 460)),
+        stats: () => Object.assign(T.data('stats', [{ value: '[00]', label: 'Metric' }, { value: '[00]', label: 'Metric' }], { size: 96 * s, cols: 2, accent: pal.accent }), box(800, 220)),
+        callout: () => Object.assign(T.data('callout', [{ title: 'Note', body: 'Callout text.' }], { tone: 'brand', size: 28 * s }), box(700, 200)),
+        tags: () => Object.assign(T.data('tags', ['Tag', 'Tag', 'Tag'], { size: 24 * s }), box(600, 60))
+      };
+      els = [(map[kind] || map.paragraph)()];
+    }
+    els.forEach(e => { e.user = true; });
+    const after = this.state.sel ? p.elements.findIndex(e => e.id === this.state.sel) : -1;
+    this.commit(doc => { const pg = doc.pages[pi]; if (pg.layout === 'flow' && after >= 0) pg.elements.splice(after + 1, 0, ...els); else pg.elements.push(...els); }, { state: { add: null, sel: els[0].id, tab: 'element' } });
+  }
+  dupEl() { const id = this.state.sel; if (!id) return; const nid = this.T.uid(); this.commit(doc => { const f = this.find(doc, id); const c = JSON.parse(JSON.stringify(f.el)); c.id = nid; c.slot = null; c.user = true; if (f.page.layout === 'free') { c.x += 24 * this.sz(); c.y += 24 * this.sz(); } f.page.elements.splice(f.ei + 1, 0, c); }, { state: { sel: nid } }); }
+  delEl() { const id = this.state.sel; if (!id) return; this.commit(doc => { const f = this.find(doc, id); if (f) f.page.elements.splice(f.ei, 1); }, { state: { sel: null, tab: 'page', editing: null } }); }
+  moveEl(id, dir) { this.commit(doc => { const f = this.find(doc, id); if (!f) return; const to = f.ei + dir; if (to < 0 || to >= f.page.elements.length) return; const [e] = f.page.elements.splice(f.ei, 1); f.page.elements.splice(to, 0, e); }); }
+  toFront(id, front) { this.commit(doc => { const f = this.find(doc, id); const [e] = f.page.elements.splice(f.ei, 1); if (front) f.page.elements.push(e); else f.page.elements.unshift(e); }); }
+  convertLayout(i) {
+    const d = this.state.doc, p = d.pages[i];
+    if (p.layout === 'flow') {
+      const root = this.canvasEl && this.canvasEl.querySelector(`[data-page-root="${p.id}"]`); if (!root) return; const z = this.zoom(), rr = root.getBoundingClientRect();
+      const boxes = {}; p.elements.forEach(e => { const n = root.querySelector(`[data-el-id="${e.id}"]`); if (n) { const b = n.getBoundingClientRect(); boxes[e.id] = { x: (b.left - rr.left) / z, y: (b.top - rr.top) / z, w: b.width / z, h: b.height / z }; } });
+      this.commit(doc => { const pg = doc.pages[i]; pg.layout = 'free'; pg.elements.forEach(e => { Object.assign(e, boxes[e.id] || { x: 40, y: 40, w: 300, h: 60 }); e.mt = 0; e.push = false; }); });
+    } else {
+      this.commit(doc => { const pg = doc.pages[i]; pg.layout = 'flow'; pg.pad = pg.pad || [64, 64, 64, 64]; pg.elements.sort((a, b) => (a.y - b.y) || (a.x - b.x)); let last = pg.pad[0]; pg.elements.forEach(e => { e.mt = Math.max(0, Math.round(e.y - last)); last = e.y + e.h; if (e.type === 'text' || e.type === 'table' || e.type === 'chart') e.w = null; }); });
+    }
+  }
+  fitText() { const id = this.state.sel; const n = this.canvasEl && this.canvasEl.querySelector(`[data-el-id="${id}"] [data-text]`); if (!n) return; const z = this.zoom(); const prev = n.style.height; n.style.height = 'auto'; const h = Math.ceil(n.scrollHeight) + 2; n.style.height = prev; this.setEl({ h }); }
+  readImage(file) {
+    return new Promise((res, rej) => {
+      if (!file) return rej(new Error('No file'));
+      if (!/^image\//.test(file.type)) return rej(new Error('Please choose an image file.'));
+      const fr = new FileReader(); fr.onerror = () => rej(new Error('Could not read the file.'));
+      fr.onload = () => {
+        if (file.type === 'image/svg+xml' || file.type === 'image/gif') return res(fr.result);
+        const im = new Image(); im.onload = () => { const k = Math.min(1, 1800 / Math.max(im.width, im.height)); const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(file.type === 'image/png' && c.width * c.height < 600000 ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.86)); }; im.onerror = () => rej(new Error('That image could not be decoded.')); im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  async upload(e, apply) { const f = e.target.files && e.target.files[0]; e.target.value = ''; try { const d = await this.readImage(f); apply(d); this.A.toast('Image added'); } catch (err) { this.A.toast(err.message, 'err'); } }
+
+  // ---------- pointer interactions ----------
+  elDown(ev, el, pi) {
+    if (this.state.preview) return;
+    ev.stopPropagation();
+    if (this.state.editing === el.id) return;
+    if (this.state.editing) this.commitEditing();
+    if (this.state.sel !== el.id || this.state.pageIdx !== pi) this.setState({ sel: el.id, pageIdx: pi, tab: 'element' });
+    const page = this.state.doc.pages[pi]; if (page.layout !== 'free' || ev.button > 0) return;
+    ev.preventDefault();
+    const z = this.zoom(), sx = ev.clientX, sy = ev.clientY, ox = el.x, oy = el.y; let moved = false;
+    const W = this.state.doc.w, H = page.h || this.state.doc.h, th = 8 / z;
+    const move = e => {
+      const dx = (e.clientX - sx) / z, dy = (e.clientY - sy) / z;
+      if (!moved && Math.hypot(dx, dy) < 4 / z) return;
+      if (!moved) { this.pushHist(); moved = true; }
+      let nx = ox + dx, ny = oy + dy; const g = [];
+      if (!e.altKey) {
+        [[0, 'l'], [W / 2 - el.w / 2, 'c'], [W - el.w, 'r']].forEach(([v, k]) => { if (Math.abs(nx - v) < th) { nx = v; g.push({ x: k === 'l' ? 0 : k === 'c' ? W / 2 : W }); } });
+        [[0, 't'], [H / 2 - el.h / 2, 'c'], [H - el.h, 'b']].forEach(([v, k]) => { if (Math.abs(ny - v) < th) { ny = v; g.push({ y: k === 't' ? 0 : k === 'c' ? H / 2 : H }); } });
+      }
+      this.raw(doc => { const pg = { ...doc.pages[pi], elements: doc.pages[pi].elements.map(x => x.id === el.id ? { ...x, x: Math.round(nx), y: Math.round(ny) } : x) }; doc.pages[pi] = pg; });
+      this.setState({ guides: { pi, g } });
+    };
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); this.setState({ guides: null }); if (moved) this.save(); };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+  }
+  handleDown(ev, el, pi, dir) {
+    ev.stopPropagation(); ev.preventDefault(); this.pushHist();
+    const z = this.zoom(), sx = ev.clientX, sy = ev.clientY, o = { x: el.x, y: el.y, w: el.w, h: el.h }; const keep = el.type === 'logo' || el.shape === 'ellipse' || (el.type === 'image' && el.radius >= 999);
+    const move = e => {
+      const dx = (e.clientX - sx) / z, dy = (e.clientY - sy) / z; let { x, y, w, h } = o;
+      if (dir.includes('e')) w = Math.max(8, o.w + dx); if (dir.includes('s')) h = Math.max(8, o.h + dy);
+      if (dir.includes('w')) { w = Math.max(8, o.w - dx); x = o.x + o.w - w; } if (dir.includes('n')) { h = Math.max(8, o.h - dy); y = o.y + o.h - h; }
+      if ((keep || e.shiftKey) && dir.length === 2) { const r = o.w / o.h; if (w / h > r) h = w / r; else w = h * r; if (dir.includes('n')) y = o.y + o.h - h; if (dir.includes('w')) x = o.x + o.w - w; }
+      this.raw(doc => { doc.pages[pi] = { ...doc.pages[pi], elements: doc.pages[pi].elements.map(q => q.id === el.id ? { ...q, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) } : q) }; });
+    };
+    const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); this.save(); };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+  }
+  elDbl(ev, el) { if (this.state.preview) return; if (el.type === 'text') { ev.stopPropagation(); this.setState({ editing: el.id, sel: el.id, tab: 'element' }, () => { const n = this.canvasEl && this.canvasEl.querySelector(`[data-el-id="${el.id}"] [data-text]`); if (n) { n.focus(); const r = document.createRange(); r.selectNodeContents(n); r.collapse(false); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } }); } }
+  commitEditing() { const id = this.state.editing; const n = this.canvasEl && this.canvasEl.querySelector(`[data-el-id="${id}"] [data-text]`); if (n) { const t = n.innerText.replace(/\n$/, ''); const f = this.find(this.state.doc, id); this.setState({ editing: null }); if (f && f.el.text !== t) this.setEl({ text: t }); } else this.setState({ editing: null }); }
+  key(e) {
+    if (!this.state.doc) return;
+    const tag = (e.target.tagName || '').toLowerCase(); const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+    const mod = e.metaKey || e.ctrlKey;
+    if (e.key === 'Escape') { if (this.state.editing) { this.commitEditing(); return; } if (this.state.add || this.state.ex) { this.setState({ add: null, ex: null }); return; } this.setState({ sel: null, tab: 'page' }); return; }
+    if (typing) return;
+    if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? this.redo() : this.undo(); return; }
+    if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); this.redo(); return; }
+    if (mod && e.key.toLowerCase() === 'd' && this.state.sel) { e.preventDefault(); this.dupEl(); return; }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && this.state.sel) { e.preventDefault(); this.delEl(); return; }
+    if (e.key === 'PageDown') { e.preventDefault(); this.selectPage(this.state.pageIdx + 1); return; }
+    if (e.key === 'PageUp') { e.preventDefault(); this.selectPage(this.state.pageIdx - 1); return; }
+    if (this.state.sel && e.key.startsWith('Arrow')) {
+      const f = this.find(this.state.doc, this.state.sel); if (!f || f.page.layout !== 'free') return; e.preventDefault();
+      const st = e.shiftKey ? 10 : 1; const d = { ArrowLeft: [-st, 0], ArrowRight: [st, 0], ArrowUp: [0, -st], ArrowDown: [0, st] }[e.key];
+      this.commit(doc => { const g = this.find(doc, this.state.sel); g.el.x += d[0]; g.el.y += d[1]; }, { key: this.state.sel + 'nudge' });
+    }
+  }
+
+  // ---------- overflow detection ----------
+  componentDidUpdate() {
+    if (!this.state.doc || this.ovT) return;
+    this.ovT = setTimeout(() => {
+      this.ovT = null; const c = this.canvasEl; if (!c || !this.state.doc) return;
+      const ov = {}; const z = this.zoom();
+      this.state.doc.pages.forEach(p => {
+        const root = c.querySelector(`[data-page-root="${p.id}"]`); if (!root) return;
+        if (p.layout === 'flow') { const cont = root.querySelector(':scope > div:last-of-type') && [...root.children].find(ch => ch.style && ch.style.flexDirection === 'column'); if (cont && cont.scrollHeight > cont.clientHeight + 2) ov[p.id] = true; }
+        else { const H = p.h || this.state.doc.h; p.elements.forEach(e => { if (e.type !== 'text' || e.deco) return; const n = root.querySelector(`[data-el-id="${e.id}"] [data-text]`); if (n && n.scrollHeight > n.clientHeight + 3) ov[e.id] = true; }); }
+      });
+      if (JSON.stringify(ov) !== JSON.stringify(this.state.overflow)) this.setState({ overflow: ov });
+    }, 400);
+  }
+
+  // ---------- export ----------
+  exportFormats() {
+    const d = this.state.doc; const k = d.kind === 'doc' ? this.T.DOC_KINDS[d.docKind] : null;
+    const F = { png: ['PNG', 'Lossless image'], jpeg: ['JPEG', 'Smaller image, adjustable quality'], webp: ['WebP', 'Modern compressed image'], svg: ['SVG', 'Vector wrapper with embedded fonts'], zip: ['ZIP of PNGs', 'Every page as a numbered PNG'], pdf: ['PDF', 'All pages, in order, at page size'], pptx: ['PowerPoint', 'Native editable text, shapes, tables, charts'], docx: ['Word (DOCX)', 'Editable headings, lists, tables, images'], epub: ['EPUB 3', 'Reflowable ebook with contents and cover'], html: ['HTML', 'Single self-contained web page'], md: ['Markdown', 'Plain structured text'], txt: ['Plain text', 'Text only'], json: ['Project file', 'Re-import later or on another device'] };
+    let ids = ['png', 'jpeg', 'webp', 'svg'];
+    if (d.pages.length > 1) ids.push('zip');
+    if (d.kind === 'graphic') { ids.push('pdf'); if (d.pages.length > 1) ids.push('pptx'); }
+    else ids = ids.concat(k.exports.filter(x => !ids.includes(x)));
+    if (!ids.includes('zip')) ids.push('zip');
+    ids.push('json');
+    return ids.map(id => ({ id, label: F[id][0], desc: F[id][1] }));
+  }
+  async runExport() {
+    const ex = this.state.ex, d = this.state.doc; if (!ex || ex.busy) return;
+    if (this.state.editing) this.commitEditing();
+    this.setState({ ex: { ...ex, busy: true, msg: 'Preparing…', ok: null }, sel: null, exporting: true, renderAll: true });
+    await new Promise(r => setTimeout(r, 200 + this.state.doc.pages.length * 25)); await document.fonts.ready;
+    const X = this.X, base = X.fileBase(d);
+    try {
+      const nodes = [...this.canvasEl.querySelectorAll('[data-page-root]')];
+      const pick = ex.scope === 'page' ? [this.state.pageIdx] : d.pages.map((p, i) => i);
+      const nodeOf = i => nodes.find(n => n.dataset.pageRoot === d.pages[i].id);
+      const f = ex.fmt; let blob, name;
+      if (['png', 'jpeg', 'webp', 'svg'].includes(f)) {
+        if (pick.length === 1) { const i = pick[0]; const url = await X.renderPage(nodeOf(i), d.w, d.pages[i].h || d.h, { type: f, scale: ex.scale, quality: ex.quality }); name = base + (d.pages.length > 1 ? '-p' + String(i + 1).padStart(2, '0') : '') + '.' + X.EXT[f]; this.A.download(url, name); }
+        else { const files = []; for (const i of pick) { this.setState({ ex: { ...this.state.ex, msg: `Rendering page ${i + 1} of ${pick.length}…` } }); const url = await X.renderPage(nodeOf(i), d.w, d.pages[i].h || d.h, { type: f, scale: ex.scale, quality: ex.quality }); files.push(f === 'svg' ? { name: `${String(i + 1).padStart(2, '0')}-${this.A.slug(d.pages[i].name)}.svg`, data: decodeURIComponent(url.split(',')[1]) } : { name: `${String(i + 1).padStart(2, '0')}-${this.A.slug(d.pages[i].name)}.${X.EXT[f]}`, data: X.b64(url), base64: true }); } blob = await X.zipFiles(files); name = base + '-' + f + '.zip'; }
+      } else if (f === 'zip') { const files = []; for (const i of pick) { this.setState({ ex: { ...this.state.ex, msg: `Rendering page ${i + 1} of ${pick.length}…` } }); const url = await X.renderPage(nodeOf(i), d.w, d.pages[i].h || d.h, { type: 'png', scale: ex.scale }); files.push({ name: `${String(i + 1).padStart(2, '0')}-${this.A.slug(d.pages[i].name)}.png`, data: X.b64(url), base64: true }); } blob = await X.zipFiles(files); name = base + '-pages.zip'; }
+      else if (f === 'pdf') { this.setState({ ex: { ...this.state.ex, msg: 'Building PDF…' } }); blob = await X.pagesToPDF(pick.map(i => ({ node: nodeOf(i), h: d.pages[i].h || d.h })), d.w, d.h, { scale: Math.min(ex.scale, 3), quality: 0.92 }); name = base + '.pdf'; }
+      else if (f === 'pptx') { this.setState({ ex: { ...this.state.ex, msg: 'Building PowerPoint…' } }); blob = await X.toPptx(d, d.pages.map((p, i) => nodeOf(i)), this.zoom()); name = base + '.pptx'; }
+      else if (f === 'docx') { blob = await X.toDocx(d); name = base + '.docx'; }
+      else if (f === 'epub') { const cover = d.pages[0] && d.pages[0].kind === 'cover' ? nodeOf(0) : null; blob = await X.toEpub(d, cover); name = base + '.epub'; }
+      else if (f === 'html') { blob = new Blob([await X.toHTML(d)], { type: 'text/html' }); name = base + '.html'; }
+      else if (f === 'md') { blob = new Blob([X.toMarkdown(d)], { type: 'text/markdown' }); name = base + '.md'; }
+      else if (f === 'txt') { blob = new Blob([X.toText(d)], { type: 'text/plain' }); name = base + '.txt'; }
+      else if (f === 'json') { blob = new Blob([JSON.stringify({ nnooProject: 1, doc: d }, null, 1)], { type: 'application/json' }); name = base + '.nnoo.json'; }
+      if (blob) this.A.download(blob, name);
+      this.setState({ exporting: false, renderAll: false, ex: { ...this.state.ex, busy: false, ok: true, msg: 'Downloaded ' + name } });
+      this.A.toast('Exported ' + name);
+    } catch (err) { console.error(err); this.setState({ exporting: false, renderAll: false, ex: { ...this.state.ex, busy: false, ok: false, msg: 'Export failed: ' + (err.message || err) } }); }
+  }
+
+  // ---------- inspector fields ----------
+  F(kind, label, o = {}) { return { kind, label, ...o }; }
+  colorField(label, value, onPick, key) {
+    const TK = this.TK; const sw = TK.BRAND_SWATCHES.concat(['transparent']);
+    return { kind: 'color', label, value: value || '', span: 2, swatches: sw.map(t => ({ name: t, on: value === t, pick: () => onPick(t === 'transparent' ? null : t), st: { width: '26px', height: '26px', borderRadius: '8px', border: value === t ? '2px solid var(--brand)' : '1px solid var(--border-strong)', background: t === 'transparent' ? 'repeating-conic-gradient(#d9cfbd 0 25%, #fff 0 50%) 0 0/10px 10px' : TK.resolveColor(t), cursor: 'pointer', padding: 0, boxShadow: value === t ? 'var(--ring)' : 'none' } })), change: e => { const v = e.target.value.trim(); if (!v || /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v) || TK.HEX[v]) onPick(v || null); } };
+  }
+  elementSections(f) {
+    const e = f.el, free = f.page.layout === 'free', FS = [];
+    const set = (k, key) => ev => { let v = ev && ev.target ? ev.target.value : ev; this.setEl({ [k]: v }, key || k); };
+    const num = (k, key, mul = 1) => ev => { const v = parseFloat(ev.target.value); if (!isNaN(v)) this.setEl({ [k]: v * mul }, key || k); };
+    const seg = (label, k, opts, val) => ({ kind: 'seg', label, span: 2, options: opts.map(([v, l]) => ({ l, on: val === v, pick: () => this.setEl({ [k]: v }) })) });
+    const focus = () => this.pushHist();
+    const lname = { text: 'Text', button: 'Button', shape: 'Shape', image: 'Image', logo: 'Logo', table: 'Table', chart: 'Chart', stats: 'Statistics', columns: 'Columns', entries: 'Entries', timeline: 'Timeline', people: 'People', tags: 'Tags', gallery: 'Gallery', toc: 'Table of contents', callout: 'Callout', pagenum: 'Page number' }[e.type] || e.type;
+    const content = [];
+    if (e.type === 'text') {
+      content.push({ kind: 'area', label: 'Text', value: e.text, rows: Math.min(10, Math.max(3, String(e.text).split('\n').length + 1)), span: 2, change: ev => this.setEl({ text: ev.target.value }, 'text') });
+      content.push({ kind: 'select', label: 'Style', value: e.role || 'body', span: 2, options: [['title', 'Title'], ['h1', 'Heading 1'], ['h2', 'Heading 2'], ['h3', 'Heading 3'], ['eyebrow', 'Eyebrow'], ['subtitle', 'Subtitle'], ['lead', 'Lead'], ['body', 'Body'], ['quote', 'Quote'], ['caption', 'Caption'], ['meta', 'Metadata'], ['label', 'Label'], ['stat', 'Statistic']].map(([v, l]) => ({ v, l })), change: ev => this.setEl({ role: ev.target.value }) });
+      if (this.state.overflow[e.id]) content.push({ kind: 'note', text: 'This text is taller than its box.', warn: true, span: 2 }, { kind: 'actions', span: 2, actions: [{ label: 'Fit box to text', run: () => this.fitText() }] });
+    } else if (e.type === 'button') content.push({ kind: 'text', label: 'Label', value: e.text, span: 2, change: set('text', 'text'), focus });
+    else if (e.type === 'image') {
+      content.push({ kind: 'file', text: 'Upload / replace image', accept: 'image/*', span: 2, change: ev => this.upload(ev, src => this.setEl({ src })) });
+      content.push({ kind: 'select', label: 'Brand image', value: Object.values(this.T.IMG).includes(e.src) ? e.src : '', span: 2, options: [{ v: '', l: 'Custom image' }, { v: this.T.IMG.warm, l: 'Placeholder — warm' }, { v: this.T.IMG.cool, l: 'Placeholder — cool' }, { v: this.T.IMG.pattern, l: 'Rhythm pattern' }, { v: this.T.IMG.wave, l: 'Waveform' }], change: ev => ev.target.value && this.setEl({ src: ev.target.value }) });
+      content.push({ kind: 'text', label: 'Alt text', value: e.alt || '', span: 2, change: set('alt', 'alt'), focus, ph: 'Describe the image' });
+      if (!free) content.push({ kind: 'text', label: 'Caption', value: e.caption || '', span: 2, change: set('caption', 'caption'), focus });
+      content.push({ kind: 'select', label: 'Fit', value: e.fit || 'cover', options: [{ v: 'cover', l: 'Fill (crop)' }, { v: 'contain', l: 'Fit (no crop)' }, { v: 'tile', l: 'Tile' }], change: set('fit') });
+      content.push({ kind: 'select', label: 'Focal point', value: e.pos || 'center', options: ['center', 'top', 'bottom', 'left', 'right'].map(v => ({ v, l: v[0].toUpperCase() + v.slice(1) })), change: set('pos') });
+      if (!free) content.push({ kind: 'number', label: 'Height (px)', value: Math.round(e.h || 200), step: 10, change: num('h') });
+      content.push(this.colorField('Overlay colour', e.overlay, v => this.setEl({ overlay: v, overlayOpacity: v ? (e.overlayOpacity || 0.4) : 0 })));
+      content.push({ kind: 'range', label: 'Overlay strength', value: e.overlayOpacity || 0, min: 0, max: 0.9, step: 0.05, display: Math.round((e.overlayOpacity || 0) * 100) + '%', span: 2, change: ev => this.setEl({ overlayOpacity: parseFloat(ev.target.value) }, 'ov'), focus });
+      content.push({ kind: 'select', label: 'Treatment', value: e.filter || 'none', span: 2, options: [{ v: 'none', l: 'Original' }, { v: 'sepia(0.25) saturate(1.1)', l: 'Warm' }, { v: 'grayscale(1) contrast(1.05)', l: 'Monochrome' }, { v: 'grayscale(1) sepia(0.45)', l: 'Archival duotone' }], change: set('filter') });
+    } else if (e.type === 'logo') content.push({ kind: 'select', label: 'Logo variant', value: e.variant, span: 2, options: this.TK.LOGOS.map(l => ({ v: l.id, l: l.name })), change: set('variant') });
+    else if (e.type === 'callout') {
+      const it = e.items[0] || { title: '', body: '' };
+      content.push({ kind: 'text', label: 'Title', value: it.title, span: 2, focus, change: ev => this.setEl({ items: [{ ...it, title: ev.target.value }] }, 'ct') });
+      content.push({ kind: 'area', label: 'Body', value: it.body, rows: 4, span: 2, change: ev => this.setEl({ items: [{ ...it, body: ev.target.value }] }, 'cb') });
+      content.push({ kind: 'select', label: 'Tone', value: e.tone || 'brand', span: 2, options: [['brand', 'Brand (clay)'], ['archival', 'Archival (forest)'], ['accent', 'Accent (marigold)'], ['community', 'Community (plum)'], ['ink', 'Ink']].map(([v, l]) => ({ v, l })), change: set('tone') });
+    } else if (e.type === 'gallery') {
+      content.push({ kind: 'gallery', span: 2, items: e.items.map((g, i) => ({ src: g.src, caption: g.caption || '', change: ev => this.setEl({ items: e.items.map((x, j) => j === i ? { ...x, caption: ev.target.value } : x) }, 'g' + i), replace: ev => this.upload(ev, src => this.setEl({ items: e.items.map((x, j) => j === i ? { ...x, src } : x) })), remove: () => this.setEl({ items: e.items.filter((x, j) => j !== i) }) })) });
+      content.push({ kind: 'file', text: 'Add image', accept: 'image/*', span: 2, change: ev => this.upload(ev, src => this.setEl({ items: e.items.concat([{ src, caption: '' }]) })) });
+      content.push({ kind: 'number', label: 'Image height', value: Math.round(e.h || 200), step: 10, change: num('h') });
+    } else if (e.type === 'toc') content.push({ kind: 'note', text: 'Generated from pages marked “Include in contents”. Page numbers update automatically.', span: 2 });
+    else if (this.SER[e.type]) {
+      const [hint, ser, par] = this.SER[e.type];
+      content.push({ kind: 'area', label: 'Data — ' + hint, value: ser(e.items), rows: Math.min(12, Math.max(4, e.items.length + 2)), span: 2, change: ev => this.setEl({ items: par(ev.target.value) }, 'data') });
+      if (e.type === 'chart') { content.push({ kind: 'text', label: 'Chart title', value: e.title || '', span: 2, change: set('title', 'title'), focus }); content.push({ kind: 'select', label: 'Chart type', value: e.chart || 'bar', options: [{ v: 'bar', l: 'Bar' }, { v: 'hbar', l: 'Horizontal bar' }, { v: 'donut', l: 'Donut' }], change: set('chart') }); content.push({ kind: 'text', label: 'Value suffix', value: e.unit || '', change: set('unit', 'unit'), ph: '% or k', focus }); content.push({ kind: 'number', label: 'Chart height', value: Math.round(e.h || 240), step: 10, change: num('h') }); content.push(this.colorField('Bar colour', e.color, v => this.setEl({ color: v }))); }
+      if (e.type === 'table') content.push({ kind: 'toggle', text: 'First row is a header', on: e.header !== false, span: 2, toggle: () => this.setEl({ header: e.header === false }) });
+      if (['stats', 'columns', 'people'].includes(e.type)) content.push({ kind: 'number', label: 'Columns', value: e.cols || e.items.length, min: 1, max: 6, step: 1, change: num('cols') });
+      if (e.type === 'columns') content.push({ kind: 'toggle', text: 'Show as cards', on: !!e.boxed, span: 2, toggle: () => this.setEl({ boxed: !e.boxed }) });
+      if (e.type === 'timeline') content.push({ kind: 'toggle', text: 'Horizontal', on: !!e.horizontal, span: 2, toggle: () => this.setEl({ horizontal: !e.horizontal }) });
+      if (['stats', 'timeline', 'people'].includes(e.type)) content.push(this.colorField('Accent', e.accent, v => this.setEl({ accent: v })));
+    }
+    FS.push({ title: lname, hint: e.slot ? 'Template slot' : (e.user ? 'Added' : ''), fields: content });
+    if (e.type === 'text' || e.type === 'button' || e.type === 'pagenum' || ['table', 'chart', 'stats', 'columns', 'entries', 'timeline', 'people', 'tags', 'toc', 'callout'].includes(e.type)) {
+      const ty = [];
+      if (e.type === 'text') ty.push({ kind: 'select', label: 'Font', value: e.font, options: [{ v: 'display', l: 'Outfit — display' }, { v: 'body', l: 'DM Sans — body' }, { v: 'archive', l: 'Fraunces — archival' }, { v: 'mono', l: 'Mono' }], change: set('font') });
+      if (e.type === 'text' || e.type === 'button') ty.push({ kind: 'select', label: 'Weight', value: String(e.weight || 400), options: [400, 500, 600, 700, 800].map(v => ({ v: String(v), l: { 400: 'Regular', 500: 'Medium', 600: 'Semibold', 700: 'Bold', 800: 'Extra bold' }[v] })), change: ev => this.setEl({ weight: parseInt(ev.target.value, 10) }) });
+      ty.push({ kind: 'number', label: 'Size (px)', value: Math.round((e.size || 14) * 10) / 10, step: 0.5, min: 4, change: num('size') });
+      if (e.type === 'text') {
+        ty.push({ kind: 'number', label: 'Line height', value: e.lh, step: 0.05, min: 0.8, max: 3, change: num('lh') });
+        ty.push({ kind: 'number', label: 'Letter spacing (em)', value: e.ls || 0, step: 0.01, min: -0.1, max: 0.4, change: num('ls') });
+        ty.push(seg('Alignment', 'align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right'], ['justify', 'Justify']], e.align));
+        if (free) ty.push(seg('Vertical', 'valign', [['top', 'Top'], ['middle', 'Middle'], ['bottom', 'Bottom']], e.valign || 'top'));
+        ty.push(seg('List', 'list', [[null, 'None'], ['bullet', 'Bullets'], ['number', 'Numbers']], e.list || null));
+        ty.push({ kind: 'toggle', text: 'Uppercase', on: !!e.upper, toggle: () => this.setEl({ upper: !e.upper }) }, { kind: 'toggle', text: 'Italic', on: !!e.italic, toggle: () => this.setEl({ italic: !e.italic }) });
+        ty.push({ kind: 'toggle', text: 'Underline', on: !!e.underline, toggle: () => this.setEl({ underline: !e.underline }) });
+        ty.push(this.colorField('Text colour', e.color, v => this.setEl({ color: v || 'ink-900' })));
+        ty.push(this.colorField('Background', e.bg, v => this.setEl({ bg: v })));
+        ty.push({ kind: 'number', label: 'Padding', value: e.pad || 0, step: 2, min: 0, change: num('pad') }, { kind: 'number', label: 'Corner radius', value: e.radius || 0, step: 2, min: 0, change: num('radius') });
+      }
+      if (e.type === 'pagenum') ty.push(this.colorField('Colour', e.color, v => this.setEl({ color: v })));
+      FS.push({ title: 'Typography', fields: ty });
+    }
+    if (e.type === 'button') FS.push({ title: 'Button style', fields: [this.colorField('Fill', e.fill, v => this.setEl({ fill: v || 'clay-500' })), this.colorField('Label colour', e.color, v => this.setEl({ color: v || 'bone' })), { kind: 'number', label: 'Corner radius', value: Math.round(e.radius || 0), step: 2, min: 0, change: num('radius') }, ...(free ? [] : [seg('Alignment', 'align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']], e.align || 'left')])] });
+    if (e.type === 'shape') FS.push({ title: 'Shape', fields: [{ kind: 'select', label: 'Shape', value: e.shape, span: 2, options: [['rect', 'Rectangle'], ['ellipse', 'Ellipse'], ['line', 'Line / rule'], ['arc-top', 'Arc (upper)'], ['arc-bottom', 'Arc (lower)'], ['motif', 'Brand motif'], ['spacer', 'Spacer']].map(([v, l]) => ({ v, l })), change: set('shape') }, this.colorField('Fill', e.fill, v => this.setEl({ fill: v })), this.colorField('Stroke', e.stroke, v => this.setEl({ stroke: v, strokeW: v ? (e.strokeW || 4) : 0 })), { kind: 'number', label: 'Stroke width', value: e.strokeW || 0, step: 1, min: 0, change: num('strokeW') }, { kind: 'number', label: 'Corner radius', value: e.radius || 0, step: 2, min: 0, change: num('radius') }, ...(free ? [] : [{ kind: 'number', label: 'Height', value: e.h || 2, step: 1, min: 1, change: num('h') }, { kind: 'number', label: 'Width (blank = full)', value: e.w || '', step: 10, change: ev => this.setEl({ w: ev.target.value ? parseFloat(ev.target.value) : null }) }])] });
+    if (e.type === 'image' || e.type === 'gallery' || e.type === 'text') { /* radius handled */ }
+    if (e.type === 'image') FS.push({ title: 'Corners', fields: [{ kind: 'number', label: 'Corner radius', value: e.radius >= 999 ? 999 : Math.round(e.radius || 0), step: 2, min: 0, change: num('radius') }, { kind: 'actions', actions: [{ label: 'Circle', run: () => this.setEl({ radius: 9999 }) }, { label: 'Square', run: () => this.setEl({ radius: 0 }) }] }] });
+    const pos = [];
+    if (free) {
+      pos.push({ kind: 'number', label: 'X', value: Math.round(e.x), step: 1, change: num('x') }, { kind: 'number', label: 'Y', value: Math.round(e.y), step: 1, change: num('y') }, { kind: 'number', label: 'Width', value: Math.round(e.w), step: 1, min: 1, change: num('w') }, { kind: 'number', label: 'Height', value: Math.round(e.h), step: 1, min: 1, change: num('h') }, { kind: 'number', label: 'Rotation (°)', value: e.rot || 0, step: 1, change: num('rot') });
+      const W = this.state.doc.w, H = f.page.h || this.state.doc.h;
+      pos.push({ kind: 'actions', label: 'Align to page', span: 2, actions: [['Left', { x: 0 }], ['Centre', { x: Math.round((W - e.w) / 2) }], ['Right', { x: W - e.w }], ['Top', { y: 0 }], ['Middle', { y: Math.round((H - e.h) / 2) }], ['Bottom', { y: H - e.h }]].map(([l, p]) => ({ label: l, run: () => this.setEl(p) })) });
+      pos.push({ kind: 'actions', label: 'Arrange', span: 2, actions: [{ label: 'Bring to front', run: () => this.toFront(e.id, true) }, { label: 'Send to back', run: () => this.toFront(e.id, false) }, { label: 'Forward', run: () => this.moveEl(e.id, 1) }, { label: 'Backward', run: () => this.moveEl(e.id, -1) }] });
+    } else {
+      pos.push({ kind: 'number', label: 'Space above (px)', value: e.push ? '' : Math.round(e.mt || 0), step: 2, change: ev => { const v = parseFloat(ev.target.value); if (!isNaN(v)) this.setEl({ mt: v, push: false }, 'mt'); } });
+      pos.push({ kind: 'toggle', text: 'Push to bottom', on: !!e.push, toggle: () => this.setEl({ push: !e.push }) });
+      if (e.type !== 'text' && e.type !== 'shape') pos.push(seg('Align', 'align', [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']], e.align || 'left'));
+      if (e.type === 'logo' || e.type === 'text' || e.type === 'image' || e.type === 'table' || e.type === 'chart') pos.push({ kind: 'number', label: 'Width (blank = auto)', value: e.w ? Math.round(e.w) : '', step: 10, change: ev => this.setEl({ w: ev.target.value ? parseFloat(ev.target.value) : null, ...(e.type === 'logo' && ev.target.value ? { h: parseFloat(ev.target.value) / (this.TK.LOGO_RATIO[e.variant] || 1) } : {}) }, 'w') });
+      pos.push({ kind: 'actions', label: 'Order', span: 2, actions: [{ label: 'Move up', run: () => this.moveEl(e.id, -1) }, { label: 'Move down', run: () => this.moveEl(e.id, 1) }] });
+    }
+    pos.push({ kind: 'range', label: 'Opacity', value: e.opacity != null ? e.opacity : 1, min: 0.05, max: 1, step: 0.05, display: Math.round((e.opacity != null ? e.opacity : 1) * 100) + '%', span: 2, change: ev => this.setEl({ opacity: parseFloat(ev.target.value) }, 'op'), focus });
+    FS.push({ title: free ? 'Position & size' : 'Spacing & order', fields: pos });
+    FS.push({ title: 'Element', fields: [{ kind: 'actions', span: 2, actions: [{ label: 'Duplicate', run: () => this.dupEl() }, { label: e.hidden ? 'Show' : 'Hide', run: () => this.setEl({ hidden: !e.hidden }) }, { label: 'Delete', danger: true, run: () => this.delEl() }] }] });
+    return FS;
+  }
+  get SER() {
+    const J = a => a.map(x => (x == null ? '' : String(x)).replace(/\n/g, ' // ')).join(' | ');
+    const S = s => s.split('|').map(x => x.trim().replace(/ ?\/\/ ?/g, '\n'));
+    const L = t => t.split('\n').filter(l => l.trim());
+    return {
+      table: ['one row per line, cells separated by |', it => it.map(J).join('\n'), t => L(t).map(S)],
+      chart: ['label | value', it => it.map(d => J([d.label, d.value])).join('\n'), t => L(t).map(l => { const [label, value] = S(l); return { label, value: parseFloat(value) || 0 }; })],
+      stats: ['value | label', it => it.map(d => J([d.value, d.label])).join('\n'), t => L(t).map(l => { const [value, label] = S(l); return { value, label: label || '' }; })],
+      columns: ['title | highlight | body', it => it.map(d => J([d.title, d.meta || '', d.body])).join('\n'), t => L(t).map(l => { const [title, meta, body] = S(l); return { title, meta: meta || '', body: body || '' }; })],
+      entries: ['title | organisation | date | bullets // separated', it => it.map(d => J([d.title, d.org, d.date, d.body])).join('\n'), t => L(t).map(l => { const [title, org, date, body] = S(l); return { title, org: org || '', date: date || '', body: body || '' }; })],
+      timeline: ['label | title | detail', it => it.map(d => J([d.label, d.title, d.body])).join('\n'), t => L(t).map(l => { const [label, title, body] = S(l); return { label, title: title || '', body: body || '' }; })],
+      people: ['name | role | bio', it => it.map(d => J([d.name, d.role, d.body])).join('\n'), t => L(t).map(l => { const [name, role, body] = S(l); return { name, role: role || '', body: body || '' }; })],
+      tags: ['one per line', it => it.join('\n'), t => L(t).map(x => x.trim())]
+    };
+  }
+  pageSections() {
+    const d = this.state.doc, i = this.state.pageIdx, p = d.pages[i], free = p.layout === 'free', T = this.T;
+    const sp = (k, key) => ev => this.setPage({ [k]: ev.target.value }, key || k);
+    const focus = () => this.pushHist();
+    const FS = [];
+    const pf = [{ kind: 'text', label: 'Page name', value: p.name, span: 2, change: sp('name', 'name'), focus }];
+    if (d.kind === 'doc') pf.push({ kind: 'text', label: 'Chapter / section', value: p.section || '', span: 2, change: sp('section', 'section'), focus, ph: 'Groups pages in the navigator' });
+    pf.push(this.colorField('Background', p.bg, v => this.setPage({ bg: v || 'bone' })));
+    pf.push({ kind: 'file', text: p.bgImage ? 'Replace background image' : 'Add background image', accept: 'image/*', span: 2, change: ev => this.upload(ev, src => this.setPage({ bgImage: src })) });
+    if (p.bgImage) pf.push({ kind: 'range', label: 'Background image opacity', value: p.bgOpacity != null ? p.bgOpacity : 1, min: 0.05, max: 1, step: 0.05, display: Math.round((p.bgOpacity != null ? p.bgOpacity : 1) * 100) + '%', span: 2, change: ev => this.setPage({ bgOpacity: parseFloat(ev.target.value) }, 'bgo'), focus }, { kind: 'actions', span: 2, actions: [{ label: 'Remove background image', run: () => this.setPage({ bgImage: null }) }] });
+    if (!free) {
+      const pad = p.pad || [0, 0, 0, 0]; const setPad = j => ev => { const v = parseFloat(ev.target.value); if (isNaN(v)) return; const np = pad.slice(); np[j] = v; this.setPage({ pad: np }, 'pad' + j); };
+      pf.push({ kind: 'number', label: 'Margin top', value: pad[0], step: 4, min: 0, change: setPad(0) }, { kind: 'number', label: 'Margin bottom', value: pad[2], step: 4, min: 0, change: setPad(2) }, { kind: 'number', label: 'Margin left', value: pad[3], step: 4, min: 0, change: setPad(3) }, { kind: 'number', label: 'Margin right', value: pad[1], step: 4, min: 0, change: setPad(1) });
+      pf.push({ kind: 'seg', label: 'Vertical distribution', span: 2, options: [['start', 'Top'], ['center', 'Centre'], ['end', 'Bottom'], ['between', 'Spread']].map(([v, l]) => ({ l, on: (p.justify || 'start') === v, pick: () => this.setPage({ justify: v }) })) });
+      if (d.kind === 'doc' && this.T.DOC_KINDS[d.docKind].continuous) pf.push({ kind: 'number', label: 'Section height (px)', value: p.h || d.h, step: 10, min: 60, span: 2, change: ev => { const v = parseFloat(ev.target.value); if (!isNaN(v)) this.setPage({ h: v }, 'h'); } });
+      if (d.kind === 'doc') { pf.push({ kind: 'toggle', text: 'Show page number', on: !!p.showNum, span: 2, toggle: () => this.setPage({ showNum: !p.showNum }) }); pf.push({ kind: 'text', label: 'Running head', value: p.runHead || '', span: 2, change: sp('runHead', 'rh'), focus, ph: 'Shown at the top of the page' }); pf.push({ kind: 'toggle', text: 'Include in contents', on: !!p.toc, span: 2, toggle: () => this.setPage({ toc: !p.toc, tocTitle: p.tocTitle || p.name }) }); if (p.toc) pf.push({ kind: 'text', label: 'Contents entry', value: p.tocTitle || p.name, span: 2, change: sp('tocTitle', 'tt'), focus }); }
+    }
+    pf.push({ kind: 'actions', label: 'Layout mode', span: 2, actions: [{ label: free ? 'Convert to flowing layout' : 'Convert to free layout', title: free ? 'Stack elements top to bottom' : 'Position elements freely', run: () => this.convertLayout(i) }] });
+    FS.push({ title: 'Page ' + (i + 1) + ' of ' + d.pages.length, hint: free ? 'Free layout' : 'Flowing layout', fields: pf });
+    FS.push({ title: 'Elements', hint: free ? 'Top of list = back' : 'Reading order', fields: [{ kind: 'actions', span: 2, actions: [{ label: '+ Add element', primary: true, run: () => this.setState({ add: { type: 'element' } }) }] }, { kind: 'layers', span: 2, noLayers: !p.elements.length, layers: p.elements.map(e => ({ type: e.type, name: e.name || (e.text ? String(e.text).slice(0, 40) : e.variant || e.shape || (e.items && e.items[0] && (e.items[0].title || e.items[0].label || e.items[0].name)) || e.type), up: () => this.moveEl(e.id, -1), down: () => this.moveEl(e.id, 1), vis: () => this.commit(doc => { const f = this.find(doc, e.id); f.el.hidden = !f.el.hidden; }), visIcon: e.hidden ? '◌' : '●', visLabel: e.hidden ? 'Show element' : 'Hide element', select: () => this.setState({ sel: e.id, tab: 'element' }), st: { display: 'flex', alignItems: 'center', gap: '2px', borderRadius: '8px', padding: '0 4px', fontSize: '12px', background: this.state.sel === e.id ? 'var(--brand-soft)' : 'transparent', color: e.hidden ? 'var(--fg-disabled)' : 'var(--fg)' } })) }] });
+    FS.push({ title: 'Page actions', fields: [{ kind: 'actions', span: 2, actions: [{ label: 'Insert before', run: () => this.setState({ add: { type: 'page', at: i } }) }, { label: 'Insert after', run: () => this.setState({ add: { type: 'page', at: i + 1 } }) }, { label: 'Duplicate', run: () => this.dupPage(i) }, { label: 'Move up', disabled: i === 0, run: () => this.movePage(i, i - 1) }, { label: 'Move down', disabled: i === d.pages.length - 1, run: () => this.movePage(i, i + 1) }, { label: 'Delete page', danger: true, disabled: d.pages.length < 2, run: () => this.delPage(i) }] }] });
+    return FS;
+  }
+  docSections() {
+    const d = this.state.doc, T = this.T, t = this.template(), FS = [];
+    const df = [{ kind: 'text', label: 'Document name', value: d.name, span: 2, change: ev => this.setDoc({ name: ev.target.value }, 'name'), focus: () => this.pushHist() }];
+    if (d.kind === 'graphic' && t) {
+      df.push({ kind: 'select', label: 'Size / channel', value: d.formatId, span: 2, options: t.formats.map(id => ({ v: id, l: T.FORMATS[id].label + ' — ' + T.FORMATS[id].w + ' × ' + T.FORMATS[id].h })), change: ev => this.relayout({ formatId: ev.target.value }) });
+      if (!t.avatar) {
+        df.push({ kind: 'select', label: 'Colour variant', value: d.palette, span: 2, options: Object.entries(T.PAL).map(([v, p]) => ({ v, l: p.name })), change: ev => this.relayout({ palette: ev.target.value }) });
+        if (!t.pages) df.push({ kind: 'select', label: 'Layout', value: d.layout, span: 2, options: Object.entries(T.LAYOUTS).filter(([k]) => k !== 'slide').map(([v, l]) => ({ v, l: l.name })), change: ev => this.relayout({ layout: ev.target.value }) });
+        df.push({ kind: 'note', text: 'Changing size, colour or layout re-flows the template. Your text and images are kept; hand-positioned template elements return to the layout.', span: 2 });
+      }
+    } else if (d.kind === 'doc') {
+      const k = T.DOC_KINDS[d.docKind];
+      df.push({ kind: 'select', label: 'Page size', value: d.formatId, span: 2, options: k.sizes.map(s => ({ v: s.id, l: s.label })), change: ev => { const s = k.sizes.find(x => x.id === ev.target.value); this.commit(doc => { doc.formatId = s.id; doc.w = s.w; doc.h = s.h; }, { after: () => this.center(this.state.pageIdx) }); } });
+      df.push({ kind: 'number', label: 'Numbering starts at page', value: (d.numbering && d.numbering.from) || 1, step: 1, min: 1, change: ev => { const v = parseInt(ev.target.value, 10); if (v > 0) this.setDoc({ numbering: { ...(d.numbering || {}), from: v } }, 'nf'); } });
+      df.push({ kind: 'select', label: 'Number style', value: (d.numbering && d.numbering.style) || 'n', options: [{ v: 'n', l: '12' }, { v: 'page', l: 'Page 12' }, { v: 'of', l: '12 / 40' }], change: ev => this.setDoc({ numbering: { ...(d.numbering || {}), style: ev.target.value } }) });
+      df.push({ kind: 'seg', label: 'Number position', span: 2, options: [['left', 'Left'], ['center', 'Centre'], ['right', 'Right']].map(([v, l]) => ({ l, on: ((d.numbering && d.numbering.align) || 'center') === v, pick: () => this.setDoc({ numbering: { ...(d.numbering || {}), align: v } }) })) });
+      df.push({ kind: 'text', label: 'Document running head', value: d.runHead || '', span: 2, change: ev => this.setDoc({ runHead: ev.target.value }, 'rh'), focus: () => this.pushHist(), ph: 'Prefixed to page running heads' });
+    }
+    df.push({ kind: 'actions', span: 2, actions: [{ label: 'Save a copy', run: () => this.saveCopy() }, { label: 'Reset to template', danger: true, run: () => this.reset() }] });
+    FS.push({ title: 'Document', hint: d.w + ' × ' + d.h, fields: df });
+    return FS;
+  }
+  relayout(o) { const t = this.template(); this.commit(doc => Object.assign(doc, this.T.relayoutGraphic(doc, t, o)), { state: { sel: null }, after: () => setTimeout(() => this.center(this.state.pageIdx, false), 60) }); }
+  reset() { const t = this.template(); if (!t) return; if (!confirm('Reset “' + this.state.doc.name + '” to the original template? Your edits will be replaced (you can undo).')) return; const fresh = this.T.newDocFromTemplate(t, this.state.doc.formatId); this.commit(doc => { const keep = { id: doc.id, created: doc.created }; Object.keys(doc).forEach(k => delete doc[k]); Object.assign(doc, fresh, keep); }, { state: { sel: null, pageIdx: 0 }, after: () => this.selectPage(0) }); }
+  saveCopy() { const c = JSON.parse(this.snap()); c.id = this.T.uid('d'); c.name = c.name + ' (copy)'; c.created = Date.now(); try { this.S.saveDoc(c); this.A.toast('Saved a copy — opening it'); location.hash = 'doc=' + c.id; } catch (e) { this.A.toast(e.message, 'err'); } }
+
+  addGroups() {
+    const a = this.state.add, d = this.state.doc, T = this.T;
+    if (a.type === 'page') {
+      const at = a.at != null ? a.at : this.state.pageIdx + 1;
+      const groups = [{ title: 'Basic', items: [{ label: 'Blank page', run: () => this.insertPage(this.blankPage(), at) }, { label: 'Duplicate current page', run: () => { this.setState({ add: null }); this.dupPage(this.state.pageIdx); } }] }];
+      if (d.kind === 'doc') {
+        let chN = d.pages.filter(p => p.kind === 'chapter').length + 1, partN = d.pages.filter(p => p.kind === 'part').length + 1, divN = d.pages.filter(p => p.kind === 'divider').length + 1;
+        groups.push({ title: T.DOC_KINDS[d.docKind].name + ' pages', items: T.PAGE_LIB[d.docKind].map(([id, name]) => ({ label: name, run: () => { const pg = T.makePage(d.docKind, id, id === 'chapter' ? chN : id === 'part' ? partN : divN); pg.user = true; const cur = d.pages[Math.max(0, at - 1)]; if (!pg.section && cur && cur.section && id !== 'cover') pg.section = cur.section; this.insertPage(pg, at); } })) });
+      } else {
+        const f = T.FORMATS[d.formatId];
+        groups.push({ title: 'Layouts in ' + (T.PAL[d.palette] || T.PAL.bone).name, items: Object.entries(T.LAYOUTS).map(([id, l]) => ({ label: l.name, run: () => { const pg = l.build(f, d.palette, { eyebrow: 'Label', title: 'New slide', body: 'Supporting text.', num: String(d.pages.length + 1).padStart(2, '0'), name: '[Name]', meta: '[Detail]', day: '00', month: 'Month', cta: id === 'headline' ? 'Learn more' : undefined, options: ['Option A', 'Option B'], leftTitle: 'Left', leftBody: 'Text', rightTitle: 'Right', rightBody: 'Text', translation: '[Translation]' }); pg.user = true; pg.name = l.name; pg.elements.forEach(e => { e.slot = null; e.user = true; }); this.insertPage(pg, at); } })) });
+      }
+      return groups;
+    }
+    const p = d.pages[this.state.pageIdx];
+    const it = (label, k, opt) => ({ label, run: () => this.newElement(k, opt) });
+    if (p.layout === 'flow') return [
+      { title: 'Text', items: [it('Heading', 'heading'), it('Subheading', 'subheading'), it('Paragraph', 'paragraph'), it('Eyebrow label', 'eyebrow'), it('Bulleted list', 'bullets'), it('Numbered list', 'numbered'), it('Pull quote', 'pull-quote'), it('Callout', 'callout'), it('Note (archival)', 'note')] },
+      { title: 'Media', items: [it('Image (placeholder)', 'image'), it('Gallery', 'gallery'), it('Logo lockup', 'logo'), it('Brand mark', 'mark'), ...this.TK.LOGOS.slice(0, 6).map(l => it(l.name, 'logo-variant', l.id))] },
+      { title: 'Data', items: [it('Table', 'table'), it('Bar chart', 'chart-bar'), it('Horizontal bars', 'chart-hbar'), it('Donut chart', 'chart-donut'), it('Statistics', 'stats')] },
+      { title: 'Structure', items: [it('Columns / cards', 'columns'), it('Timeline', 'timeline'), it('Dated entries', 'entries'), it('People / team', 'people'), it('Tags / skills', 'tags'), it('Button / CTA', 'button'), it('Table of contents', 'toc'), it('Divider', 'divider'), it('Spacer', 'spacer')] }
+    ];
+    return [
+      { title: 'Text', items: [it('Heading', 'heading'), it('Subheading', 'subheading'), it('Paragraph', 'paragraph'), it('Eyebrow label', 'eyebrow'), it('Bulleted list', 'bullets'), it('Numbered list', 'numbered'), it('Quote', 'pull-quote'), it('Button / CTA', 'button'), it('Page number', 'pagenum')] },
+      { title: 'Brand', items: this.TK.LOGOS.map(l => it(l.name, 'logo-variant', l.id)).concat([it('Rhythm pattern (full page)', 'pattern'), it('Waveform', 'wave')]) },
+      { title: 'Shapes & media', items: [it('Image (placeholder)', 'image'), it('Rectangle', 'rect'), it('Ellipse', 'ellipse'), it('Line', 'line'), it('Arc', 'arcs'), it('Brand motif (arcs + dot)', 'motif')] },
+      { title: 'Data', items: [it('Table', 'table'), it('Bar chart', 'chart-bar'), it('Statistics', 'stats'), it('Callout', 'callout'), it('Tags', 'tags')] }
+    ];
+  }
+
+  memo(kind, p, i, o) {
+    const d = this.state.doc; this.vc = this.vc || {};
+    const has = id => id && p.elements.some(e => e.id === id);
+    const usesToc = p.elements.some(e => e.type === 'toc');
+    const key = [kind, i, o.zoom, has(o.sel) ? o.sel : '', has(o.editing) ? o.editing : '', !!o.interactive, !!o.exporting, !!o.pageSelected, o.nums[i], d.w, d.h, d.runHead || '', JSON.stringify(d.numbering || {}), usesToc ? JSON.stringify(o.toc) : '', JSON.stringify(p)].join('|');
+    const c = this.vc[kind + p.id];
+    if (c && c.key === key) return c.view;
+    const view = this.R.pageView(d, i, o); this.vc[kind + p.id] = { key, view }; return view;
+  }
+  renderVals() {
+    const s = this.state, d = s.doc;
+    const base = { loading: s.loading, empty: !s.loading && !d, ready: !!d, emptyMsg: s.emptyMsg };
+    if (!d) {
+      const recent = this.S ? this.S.listDocs().slice(0, 8).map(r => ({ name: r.name, meta: r.w + ' × ' + r.h + ' · ' + r.pages + (r.pages === 1 ? ' page' : ' pages') + ' · ' + new Date(r.updated).toLocaleDateString(), href: 'Editor.dc.html#doc=' + r.id })) : [];
+      return { ...base, hasRecent: recent.length > 0, recent, addOpen: false, exportOpen: false };
+    }
+    const T = this.T, R = this.R, X = this.X;
+    const wide = s.w >= 1024, small = s.w < 640;
+    const z = this.zoom(); const nums = X.pageNumbers(d), toc = X.tocItems(d);
+    const handlers = { down: (e, el, pi) => this.elDown(e, el, pi), dbl: (e, el) => this.elDbl(e, el), blur: () => this.state.editing && this.commitEditing(), handle: (e, el, pi, dir) => this.handleDown(e, el, pi, dir), pageDown: (e, pi) => { if (s.preview) return; if (this.state.editing) this.commitEditing(); if (this.state.pageIdx !== pi || this.state.sel) { this.setState({ sel: null, tab: 'page' }); if (this.state.pageIdx !== pi) this.selectPage(pi, { smooth: true }); } } };
+    const cont = d.kind === 'doc' && T.DOC_KINDS[d.docKind].continuous;
+    const canvasPages = d.pages.map((p, i) => {
+      const live = this.isLive(i);
+      const view = !live ? null : this.memo('c', p, i, { zoom: z, sel: s.sel, editing: s.editing, interactive: !s.preview, exporting: s.exporting, handlers, nums, toc, pageSelected: i === s.pageIdx && !s.sel && d.pages.length > 1 });
+      const gs = s.guides && s.guides.pi === i ? s.guides.g.map(g => ({ st: g.x != null ? { position: 'absolute', left: g.x * z + 'px', top: 0, bottom: 0, width: '1px', background: '#d9a019', pointerEvents: 'none' } : { position: 'absolute', top: g.y * z + 'px', left: 0, right: 0, height: '1px', background: '#d9a019', pointerEvents: 'none' } })) : [];
+      return { pid: p.id, view, live, ghost: !live, ghostSt: { width: d.w * z + 'px', height: (p.h || d.h) * z + 'px', background: this.TK.resolveColor(p.bg || 'bone'), boxShadow: '0 6px 18px rgba(58,24,9,.14)', opacity: 0.6 }, guides: gs, showLabel: !s.preview && !(cont && i > 0 && !s.overflow[p.id]), label: (i + 1) + ' · ' + p.name + (p.section ? ' — ' + p.section : ''), labelSt: { fontWeight: i === s.pageIdx ? 600 : 500, color: i === s.pageIdx ? 'var(--brand)' : 'var(--fg-subtle)' }, warn: !!s.overflow[p.id] && !s.preview, flowOver: () => this.flowOverflow(i), wrapStyle: { display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-start', marginTop: i === 0 ? 0 : (cont && !s.preview ? '0px' : cont ? 0 : '28px') } };
+    });
+    // navigator
+    const thumbW = 56; let lastSec = null;
+    const navItems = d.pages.map((p, i) => {
+      const hasSection = !!p.section && p.section !== lastSec; lastSec = p.section || lastSec; if (!p.section) lastSec = null;
+      const collapsed = p.section && s.collapsed[p.section];
+      const tz = Math.min(thumbW / d.w, 72 / (p.h || d.h));
+      const on = i === s.pageIdx;
+      return { pid: p.id, num: String(i + 1), name: p.name, hasSection, section: p.section, caret: s.collapsed[p.section] ? '▸' : '▾', toggleSection: () => this.setState({ collapsed: { ...s.collapsed, [p.section]: !s.collapsed[p.section] } }), visible: !collapsed || on, isSel: on && !s.preview, warn: !!s.overflow[p.id],
+        live: Math.abs(i - s.pageIdx) <= 12, ghost: Math.abs(i - s.pageIdx) > 12, ghostSt: { width: Math.round(d.w * tz) + 'px', height: Math.round((p.h || d.h) * tz) + 'px', background: this.TK.resolveColor(p.bg || 'bone'), borderRadius: '4px', boxShadow: '0 1px 3px rgba(58,24,9,.12)' },
+        thumb: Math.abs(i - s.pageIdx) <= 12 ? this.memo('t', p, i, { zoom: tz, thumb: true, nums, toc }) : null, thumbBox: { width: thumbW + 'px', height: Math.round((p.h || d.h) * tz) + 'px', flex: 'none', pointerEvents: 'none', display: 'flex', justifyContent: 'center' },
+        select: () => this.selectPage(i, { toCanvas: true }), up: ev => { ev.stopPropagation(); this.movePage(i, i - 1); }, down: ev => { ev.stopPropagation(); this.movePage(i, i + 1); }, dup: ev => { ev.stopPropagation(); this.dupPage(i); }, del: ev => { ev.stopPropagation(); this.delPage(i); }, insBefore: ev => { ev.stopPropagation(); this.setState({ add: { type: 'page', at: i } }); }, insAfter: ev => { ev.stopPropagation(); this.setState({ add: { type: 'page', at: i + 1 } }); },
+        dragStart: ev => { ev.dataTransfer.effectAllowed = 'move'; ev.dataTransfer.setData('text/plain', String(i)); this.setState({ drag: { from: i, over: i } }); }, dragOver: ev => { ev.preventDefault(); if (this.state.drag && this.state.drag.over !== i) this.setState({ drag: { ...this.state.drag, over: i } }); }, drop: ev => { ev.preventDefault(); const from = parseInt(ev.dataTransfer.getData('text/plain'), 10); this.setState({ drag: null }); if (!isNaN(from)) this.movePage(from, i); }, dragEnd: () => this.setState({ drag: null }),
+        st: { display: 'flex', gap: '10px', alignItems: 'flex-start', padding: '8px', borderRadius: '12px', cursor: 'pointer', background: on ? 'var(--brand-soft)' : 'transparent', border: s.drag && s.drag.over === i && s.drag.from !== i ? '2px dashed var(--brand)' : '2px solid transparent', marginBottom: '2px', opacity: s.drag && s.drag.from === i ? 0.5 : 1 } };
+    });
+    // inspector
+    const f = s.sel ? this.find(d, s.sel) : null;
+    const tab = f && s.tab === 'element' ? 'element' : s.tab === 'doc' ? 'doc' : 'page';
+    let sections = tab === 'element' && f ? this.elementSections(f) : tab === 'doc' ? this.docSections() : this.pageSections();
+    const inputSt = { width: '100%', height: '38px', border: '1px solid var(--border)', borderRadius: '10px', background: 'var(--bg-card)', color: 'var(--fg)', padding: '0 10px', fontSize: '13px', fontFamily: 'var(--font-body)' };
+    sections = sections.map(sec => ({ ...sec, hint: sec.hint || '', fields: sec.fields.map(fd => {
+      const k = fd.kind;
+      const o = { ...fd, hasLabel: !!fd.label && k !== 'toggle', cell: { gridColumn: fd.span === 2 || ['area', 'color', 'actions', 'seg', 'layers', 'file', 'note', 'gallery', 'range'].includes(k) ? '1 / -1' : 'auto', minWidth: 0 }, isText: k === 'text', isNumber: k === 'number', isArea: k === 'area', isSelect: k === 'select', isSeg: k === 'seg', isToggle: k === 'toggle', isColor: k === 'color', isRange: k === 'range', isActions: k === 'actions', isFile: k === 'file', isNote: k === 'note', isLayers: k === 'layers', isGallery: k === 'gallery', value: fd.value == null ? '' : fd.value, ph: fd.ph || '', rows: fd.rows || 3, step: fd.step || 1, min: fd.min, max: fd.max };
+      if (k === 'select') o.options = fd.options.map(op => ({ v: op.v, l: op.l, sel: String(op.v) === String(o.value) }));
+      if (k === 'seg') o.options = fd.options.map(op => ({ ...op, st: { flex: 1, minWidth: 0, height: '32px', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', background: op.on ? 'var(--bg-card)' : 'transparent', color: op.on ? 'var(--brand)' : 'var(--fg-muted)', boxShadow: op.on ? 'var(--shadow-xs)' : 'none', padding: '0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' } }));
+      if (k === 'toggle') { o.trackSt = { width: '34px', height: '20px', borderRadius: '999px', background: fd.on ? 'var(--brand)' : 'var(--border-strong)', position: 'relative', flex: 'none', transition: 'background 120ms' }; o.knobSt = { position: 'absolute', top: '2px', left: fd.on ? '16px' : '2px', width: '16px', height: '16px', borderRadius: '50%', background: '#fff', boxShadow: 'var(--shadow-xs)', transition: 'left 120ms' }; }
+      if (k === 'actions') o.actions = fd.actions.map(a => ({ ...a, title: a.title || a.label, disabled: !!a.disabled, st: { height: '34px', padding: '0 12px', borderRadius: '10px', fontSize: '12px', fontWeight: 600, cursor: a.disabled ? 'not-allowed' : 'pointer', opacity: a.disabled ? 0.5 : 1, border: a.primary ? 'none' : '1px solid ' + (a.danger ? 'var(--danger)' : 'var(--border-strong)'), background: a.primary ? 'var(--brand)' : 'var(--bg-card)', color: a.primary ? 'var(--fg-on-clay)' : a.danger ? 'var(--danger)' : 'var(--fg)' } }));
+      if (k === 'note') o.noteSt = { margin: 0, fontSize: '12px', lineHeight: 1.5, color: fd.warn ? 'var(--danger)' : 'var(--fg-subtle)', fontWeight: fd.warn ? 600 : 400 };
+      return o;
+    }) }));
+    const tabSt = on => ({ flex: 1, height: '34px', borderRadius: '10px', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer', background: on ? 'var(--brand-soft)' : 'transparent', color: on ? 'var(--brand-soft-fg)' : 'var(--fg-muted)' });
+    const inspTabs = [['element', 'Element', !!f], ['page', 'Page', true], ['doc', 'Document', true]].filter(x => x[2]).map(([id, label]) => ({ label, on: tab === id, st: tabSt(tab === id), pick: () => this.setState({ tab: id }) }));
+    // layout
+    const mp = s.mpanel; const showNav = !s.preview && (wide || mp === 'pages'), showInsp = !s.preview && (wide || mp === 'props'), showCanvas = wide || mp === 'canvas' || s.preview;
+    const workStyle = { flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: wide && !s.preview ? (s.w >= 1280 ? '264px minmax(0,1fr) 340px' : '232px minmax(0,1fr) 300px') : 'minmax(0,1fr)' };
+    const iconBtn = { width: '40px', height: '40px', borderRadius: '12px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--fg)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '16px' };
+    const iconBtnSm = { width: '32px', height: '32px', borderRadius: '9px', border: 'none', background: 'transparent', color: 'var(--fg)', cursor: 'pointer', fontSize: '18px', lineHeight: 1 };
+    const micro = { minWidth: '26px', height: '26px', borderRadius: '7px', border: '1px solid var(--border)', background: 'var(--bg-card)', color: 'var(--fg-muted)', fontSize: '11px', cursor: 'pointer', padding: '0 5px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', position: 'relative' };
+    const smallBtn = { height: '30px', padding: '0 10px', borderRadius: '9px', border: '1px solid var(--border-strong)', background: 'var(--bg-card)', color: 'var(--fg)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' };
+    // export modal
+    const ex = s.ex; let exv = { exportOpen: false };
+    if (ex) {
+      const fmts = this.exportFormats(); const img = ['png', 'jpeg', 'webp', 'svg', 'zip', 'pdf'].includes(ex.fmt);
+      const pill = on => ({ height: '36px', padding: '0 14px', borderRadius: '10px', border: on ? '2px solid var(--brand)' : '1px solid var(--border-strong)', background: on ? 'var(--brand-soft)' : 'var(--bg-card)', color: on ? 'var(--brand-soft-fg)' : 'var(--fg)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' });
+      const per = ['png', 'jpeg', 'webp', 'svg'].includes(ex.fmt);
+      const cnt = ex.scope === 'page' ? 1 : d.pages.length;
+      const dims = ex.fmt === 'svg' ? `${d.w} × ${d.h}` : `${Math.round(d.w * ex.scale)} × ${Math.round(d.h * ex.scale)} px`;
+      const sum = {
+        png: `${cnt === 1 ? 'One PNG' : cnt + ' PNGs in a ZIP'} at ${dims}.`, jpeg: `${cnt === 1 ? 'One JPEG' : cnt + ' JPEGs in a ZIP'} at ${dims}, quality ${Math.round(ex.quality * 100)}%.`, webp: `${cnt === 1 ? 'One WebP' : cnt + ' WebPs in a ZIP'} at ${dims}.`,
+        svg: `${cnt === 1 ? 'One SVG' : cnt + ' SVGs in a ZIP'} (${dims}). Text and fonts are embedded via SVG foreignObject; best viewed in browsers. For print vector work use PDF or PPTX.`,
+        zip: `A ZIP with ${cnt} numbered PNG${cnt === 1 ? '' : 's'} at ${dims}.`, pdf: `A ${cnt}-page PDF at ${d.w} × ${d.h} px per page, rendered at ${ex.scale}× for print sharpness. Text is rasterised — use DOCX/EPUB for selectable text.`,
+        pptx: `${d.pages.length} slides at ${(d.w / 96).toFixed(2)} × ${(d.h / 96).toFixed(2)} in. Text, buttons, shapes, tables and charts stay editable; logos, images and complex blocks are embedded as images. Install Outfit, DM Sans and Fraunces for exact type.`,
+        docx: 'Editable Word document: headings, paragraphs, lists, tables, images, page breaks per page, page size and margins. Decorative layout (backgrounds, free positioning) is simplified.',
+        epub: 'EPUB 3 with a chapter per contents entry, navigation, embedded brand fonts, images and a cover image. Reflowable — page numbers are replaced by the reader’s own pagination.',
+        html: 'A single self-contained HTML page with embedded fonts and images, in reading order.', md: 'Markdown in reading order — headings, lists, quotes and tables. Images reference their file paths.', txt: 'Plain text in reading order.', json: 'A project file with the full edited document. Import it from the Template Library on any device.'
+      }[ex.fmt];
+      exv = { exportOpen: true, exFormats: fmts.map(x => ({ ...x, on: ex.fmt === x.id, pick: () => this.setState({ ex: { ...this.state.ex, fmt: x.id, msg: '', ok: null, scope: ['png', 'jpeg', 'webp', 'svg'].includes(x.id) ? this.state.ex.scope : 'all' } }), st: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px', textAlign: 'left', padding: '10px 12px', borderRadius: '12px', border: ex.fmt === x.id ? '2px solid var(--brand)' : '1px solid var(--border)', background: ex.fmt === x.id ? 'var(--brand-soft)' : 'var(--bg)', color: 'var(--fg)', cursor: 'pointer', minHeight: '58px' } })),
+        exShowScope: per && d.pages.length > 1, exScopes: [['page', 'Current page (' + (s.pageIdx + 1) + ')'], ['all', 'All ' + d.pages.length + ' pages']].map(([v, l]) => ({ label: l, on: ex.scope === v, st: pill(ex.scope === v), pick: () => this.setState({ ex: { ...this.state.ex, scope: v } }) })),
+        exShowScale: img && ex.fmt !== 'svg', exScales: [1, 2, 3].map(v => ({ label: v + '× — ' + Math.round(d.w * v) + ' × ' + Math.round(d.h * v), on: ex.scale === v, st: pill(ex.scale === v), pick: () => this.setState({ ex: { ...this.state.ex, scale: v } }) })),
+        exShowQuality: ex.fmt === 'jpeg' || ex.fmt === 'webp', exQuality: ex.quality, exQualityPct: Math.round(ex.quality * 100) + '%', setQuality: e => this.setState({ ex: { ...this.state.ex, quality: parseFloat(e.target.value) } }),
+        exSummary: sum, exHasMsg: !!ex.msg, exMsg: ex.msg, exMsgSt: { margin: 0, fontSize: '13px', fontWeight: 600, color: ex.ok === false ? 'var(--danger)' : ex.ok ? 'var(--success)' : 'var(--fg-muted)' }, exBusy: !!ex.busy, exBtnLabel: ex.busy ? 'Working…' : 'Download', runExport: () => this.runExport(),
+        exBtnSt: { height: '44px', padding: '0 22px', borderRadius: '12px', border: 'none', background: 'var(--brand)', color: 'var(--fg-on-clay)', fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '15px', cursor: ex.busy ? 'wait' : 'pointer', opacity: ex.busy ? 0.6 : 1 } };
+    }
+    const add = s.add;
+    const addv = add ? { addOpen: true, addTitle: add.type === 'page' ? (d.kind === 'doc' ? 'Add a page' : 'Add a page / slide') : 'Add an element', addSub: add.type === 'page' ? 'Inserted at position ' + ((add.at != null ? add.at : s.pageIdx + 1) + 1) + '.' : (d.pages[s.pageIdx].layout === 'flow' ? 'Inserted after the selected element, or at the end of page ' + (s.pageIdx + 1) + '.' : 'Placed in the centre of page ' + (s.pageIdx + 1) + '. Drag to position.'), addGroups: this.addGroups() } : { addOpen: false };
+    const mtabs = [['pages', 'Pages'], ['canvas', 'Canvas'], ['props', 'Edit']].map(([id, l]) => ({ label: l, on: mp === id, pick: () => this.setState({ mpanel: id }, () => id === 'canvas' && setTimeout(() => { this.measure(); this.center(this.state.pageIdx, false); }, 50)), st: { flex: 1, height: '52px', border: 'none', background: 'transparent', color: mp === id ? 'var(--brand)' : 'var(--fg-subtle)', fontWeight: 600, fontSize: '14px', borderTop: mp === id ? '2px solid var(--brand)' : '2px solid transparent', cursor: 'pointer' } }));
+    const k = d.kind === 'doc' ? T.DOC_KINDS[d.docKind] : null;
+    return {
+      ...base, ...exv, ...addv,
+      docName: d.name, showMeta: s.w >= 1200, renameDoc: e => this.setDoc({ name: e.target.value }, 'name'),
+      docMeta: (k ? k.name : (T.FORMATS[d.formatId] || {}).label) + ' · ' + d.w + ' × ' + d.h + ' · ' + d.pages.length + (d.pages.length === 1 ? ' page' : ' pages'),
+      saveText: s.saveState === 'saving' ? 'Saving…' : s.saveState === 'error' ? 'Not saved' : 'Saved locally', saveStyle: { fontSize: '12px', color: s.saveState === 'error' ? 'var(--danger)' : 'var(--fg-subtle)', fontWeight: s.saveState === 'error' ? 600 : 400, whiteSpace: 'nowrap' },
+      undo: () => this.undo(), redo: () => this.redo(), noUndo: !s.hist.length, noRedo: !s.fut.length,
+      zoomLabel: Math.round(z * 100) + '%', zoomFit: () => this.setState({ zoom: 'fit' }, () => this.center(s.pageIdx)), zoomIn: () => this.setState({ zoom: Math.min(4, z * 1.25) }, () => this.center(this.state.pageIdx, false)), zoomOut: () => this.setState({ zoom: Math.max(0.05, z / 1.25) }, () => this.center(this.state.pageIdx, false)),
+      zoomLabelSt: { minWidth: '56px', height: '32px', border: 'none', background: 'transparent', color: 'var(--fg)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' },
+      preview: s.preview, previewLabel: s.preview ? 'Exit preview' : 'Preview', togglePreview: () => this.setState({ preview: !s.preview, sel: null, editing: null }, () => setTimeout(() => { this.measure(); this.center(this.state.pageIdx, false); }, 60)),
+      previewBtnSt: { height: '40px', padding: '0 14px', borderRadius: '12px', border: '1px solid var(--border-strong)', background: s.preview ? 'var(--bg-inverse)' : 'var(--bg-card)', color: s.preview ? 'var(--fg-inverse)' : 'var(--fg)', fontSize: '14px', fontWeight: 600, cursor: 'pointer' },
+      openExport: () => this.setState({ ex: { fmt: d.kind === 'doc' ? 'pdf' : 'png', scope: d.kind === 'doc' ? 'all' : 'page', scale: d.w * d.h > 4e6 ? 1 : 2, quality: 0.9, msg: '' } }), closeExport: () => !(s.ex && s.ex.busy) && this.setState({ ex: null }), stop: e => e.stopPropagation(),
+      closeAdd: () => this.setState({ add: null }),
+      iconBtn, iconBtnSm, microBtn: micro, microBtnDanger: { ...micro, color: 'var(--danger)' }, microBtnLabel: { ...micro, cursor: 'pointer' }, smallBtn, smallBtnBrand: { ...smallBtn, background: 'var(--brand)', color: 'var(--fg-on-clay)', border: 'none' }, ghostBtn: { height: '44px', padding: '0 18px', borderRadius: '12px', border: '1px solid var(--border-strong)', background: 'transparent', color: 'var(--fg)', fontWeight: 600, fontSize: '14px', cursor: 'pointer' },
+      workStyle, showNav, showInsp, showCanvas, mobileTabs: !wide && !s.preview, mtabs,
+      navStyle: { borderRight: wide ? '1px solid var(--border)' : 'none', background: 'var(--bg)', display: 'flex', flexDirection: 'column', minHeight: 0 },
+      inspStyle: { borderLeft: wide ? '1px solid var(--border)' : 'none', background: 'var(--bg)', display: 'flex', flexDirection: 'column', minHeight: 0 },
+      navTitle: d.kind === 'doc' ? (d.docKind === 'presentation' ? 'Slides' : d.docKind === 'article' || d.docKind === 'newsletter' ? 'Sections' : 'Pages') : 'Pages', addPageLabel: d.kind === 'doc' ? '+ Page' : '+ Slide', openAddPage: () => this.setState({ add: { type: 'page', at: s.pageIdx + 1 } }), isBook: d.docKind === 'ebook', addChapter: () => this.addChapter(),
+      navItems, navRef: el => { this.navEl = el; },
+      canvasRef: el => { if (el && el !== this.canvasEl) { this.canvasEl = el; this.observed = null; setTimeout(() => { this.measure(); this.center(this.state.pageIdx, false); }, 80); } else if (!el) this.canvasEl = null; },
+      canvasScroll: () => this.onScrollCanvas(),
+      canvasDown: e => { if (e.target === e.currentTarget || e.target === e.currentTarget.firstChild) { if (this.state.editing) this.commitEditing(); this.setState({ sel: null, tab: 'page' }); } },
+      canvasStyle: { overflow: 'auto', minWidth: 0, minHeight: 0, position: 'relative', background: s.preview ? 'var(--bg-inverse)' : 'var(--bg-raised)', backgroundImage: s.preview ? 'none' : 'radial-gradient(rgba(58,24,9,0.06) 1px, transparent 1px)', backgroundSize: '16px 16px', overscrollBehavior: 'contain' },
+      canvasInner: { padding: small ? '20px 16px 120px' : '48px 48px 40vh', display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: 'min-content' },
+      canvasPages, inspTabs, sections, inputSt, areaSt: { ...inputSt, height: 'auto', padding: '8px 10px', lineHeight: 1.5, resize: 'vertical', fontFamily: 'var(--font-body)' }
+    };
+  }
+}
+</script>
+</body>
+</html>

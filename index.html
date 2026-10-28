@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nnọọ Brand Studio</title>
+<meta name="description" content="Nnọọ Brand Studio — design system, voice, assets, templates and editor.">
+<meta name="theme-color" content="#faf5ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17110b" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/svg+xml" href="/assets/brand/favicon/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/favicon/favicon-32.png">
+<link rel="apple-touch-icon" href="/assets/brand/favicon/apple-touch-icon-180.png">
+<link rel="stylesheet" href="/assets/brand/fonts/fonts.css">
+<script>
+  // Set the theme before first paint so there is no flash of the wrong theme.
+  (function () { try { var p = localStorage.getItem('nnoo.theme') || 'system'; var m = p === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : p; document.documentElement.dataset.theme = m; document.documentElement.style.colorScheme = m; } catch (e) {} })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

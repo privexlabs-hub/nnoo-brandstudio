@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link rel="stylesheet" href="assets/brand/fonts/fonts.css"><style>body{margin:0;background:#ddd}</style></helmet>
+<div style="display:flex;flex-wrap:wrap;gap:12px;padding:12px;font:11px sans-serif">
+<sc-for list="{{ items }}" as="t"><div style="display:flex;flex-direction:column;gap:4px;"><div style="{{ t.box }}"><dc-import name="Nnoo Page" view="{{ t.view }}" hint-size="10px,10px"></dc-import></div><span>{{ t.name }}</span></div></sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { items: [] };
+  async componentDidMount() {
+    const u = p => import(new URL(p, location.href).href);
+    const [T, R] = await Promise.all([u('lib/templates.js'), u('lib/render.js')]);
+    const h = location.hash.slice(1).split('&'); const cat = h[0] || 'square'; const BW = parseInt(h[1] || '280', 10); const fmtAll = h[2] === 'all';
+    const items = [];
+    T.TEMPLATES.concat(T.DOC_TEMPLATES).filter(t => t.cat === cat || t.id === cat).forEach(t => {
+      (fmtAll ? t.formats : [t.formats[0]]).forEach(f => { const d = T.newDocFromTemplate(t, f); const pages = cat === t.id || t.kind === 'doc' && h[3] === 'pages' ? d.pages.map((p, i) => i) : [0];
+        pages.forEach(i => { const H = d.pages[i].h || d.h; const z = Math.min(BW / d.w, BW * 1.2 / H); items.push({ name: t.name + ' ' + f + ' p' + (i + 1), bw: BW + 'px', box: { width: BW + 'px', height: H * z + 'px' }, view: R.pageView(d, i, { zoom: z, thumb: true, nums: d.pages.map((p, j) => j + 1), toc: d.pages.map((p, j) => p.toc ? { title: p.tocTitle || p.name, n: j + 1 } : null).filter(Boolean) }) }); }); });
+    });
+    this.setState({ items });
+  }
+  renderVals() { return { items: this.state.items }; }
+}
+</script>
+</body>
+</html>

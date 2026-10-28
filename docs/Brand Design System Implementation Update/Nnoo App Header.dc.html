@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<header style="position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);font-family:var(--font-body)">
+<div style="max-width:1440px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;gap:16px">
+<a href="Brand%20Studio.dc.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--fg);flex:none">
+<img src="assets/brand/logo/nnoo-mark-clay.svg" alt="" style="width:30px;height:30px">
+<span style="font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-0.02em">Nnọọ</span>
+<span style="font-family:var(--font-body);font-size:13px;color:var(--fg-subtle);font-weight:500">Brand Studio</span>
+</a>
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+<nav aria-label="Main" style="display:flex;gap:2px;margin-left:8px;flex:1;min-width:0;overflow-x:auto">
+<sc-for list="{{ links }}" as="l" hint-placeholder-count="7"><a href="{{ l.href }}" aria-current="{{ l.current }}" style="{{ l.st }}">{{ l.label }}</a></sc-for>
+</nav>
+</sc-if>
+<sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}"><div style="flex:1"></div></sc-if>
+<div role="group" aria-label="Theme" style="display:flex;background:var(--bg-raised);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;flex:none">
+<sc-for list="{{ themes }}" as="t" hint-placeholder-count="3"><button type="button" title="{{ t.label }}" aria-pressed="{{ t.on }}" onClick="{{ t.pick }}" style="{{ t.st }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{ t.icon }}"></path></svg></button></sc-for>
+</div>
+<sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}"><button type="button" aria-label="Menu" aria-expanded="{{ menu }}" onClick="{{ toggleMenu }}" style="width:44px;height:44px;border-radius:12px;border:1px solid var(--border);background:var(--bg-card);color:var(--fg);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="{{ menuIcon }}"></path></svg></button></sc-if>
+</div>
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Main" style="border-top:1px solid var(--border);background:var(--bg);padding:8px 12px 16px;display:flex;flex-direction:column;gap:2px;box-shadow:var(--shadow-lg)">
+<sc-for list="{{ links }}" as="l"><a href="{{ l.href }}" style="{{ l.mst }}">{{ l.label }}</a></sc-for>
+</nav>
+</sc-if>
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}"><div role="status" aria-live="polite" style="{{ toastStyle }}">{{ toastMsg }}</div></sc-if>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;active&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;studio&quot;, &quot;system&quot;, &quot;playbook&quot;, &quot;voice&quot;, &quot;assets&quot;, &quot;templates&quot;, &quot;editor&quot;], &quot;default&quot;: &quot;studio&quot;, &quot;tsType&quot;: &quot;string&quot;}, &quot;$preview&quot;: {&quot;width&quot;: &quot;100%&quot;, &quot;height&quot;: &quot;80px&quot;}}">
+class Component extends DCLogic {
+  state = { pref: 'system', w: typeof window !== 'undefined' ? window.innerWidth : 1200, menu: false, toast: null };
+  async componentDidMount() {
+    this.app = await import(new URL('lib/app.js', location.href).href);
+    this.app.initTheme();
+    this.setState({ pref: this.app.getPref() });
+    this.onResize = () => this.setState({ w: window.innerWidth });
+    this.onToast = e => { clearTimeout(this.tt); this.setState({ toast: e.detail }); this.tt = setTimeout(() => this.setState({ toast: null }), e.detail.kind === 'err' ? 6000 : 2600); };
+    this.onTheme = e => this.setState({ pref: e.detail.pref });
+    window.addEventListener('resize', this.onResize); window.addEventListener('nnoo-toast', this.onToast); window.addEventListener('nnoo-theme', this.onTheme);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('nnoo-toast', this.onToast); window.removeEventListener('nnoo-theme', this.onTheme); }
+  renderVals() {
+    const active = this.props.active || '';
+    const L = [['studio', 'Studio', 'Brand%20Studio.dc.html'], ['system', 'Design system', 'Design%20System.dc.html'], ['playbook', 'Playbook', 'Brand%20Playbook.dc.html'], ['voice', 'Voice & knowledge', 'Brand%20Voice.dc.html'], ['assets', 'Assets', 'Asset%20Library.dc.html'], ['templates', 'Templates', 'Template%20Library.dc.html'], ['editor', 'Editor', 'Editor.dc.html']];
+    const wide = this.state.w >= 1080;
+    const links = L.map(([id, label, href]) => {
+      const on = id === active;
+      return { label, href, current: on ? 'page' : undefined,
+        st: { padding: '8px 12px', borderRadius: '10px', fontSize: '14px', fontWeight: on ? 600 : 500, color: on ? 'var(--brand-soft-fg)' : 'var(--fg-muted)', background: on ? 'var(--brand-soft)' : 'transparent', textDecoration: 'none', whiteSpace: 'nowrap' },
+        mst: { padding: '12px 14px', borderRadius: '12px', fontSize: '16px', fontWeight: on ? 600 : 500, color: on ? 'var(--brand-soft-fg)' : 'var(--fg)', background: on ? 'var(--brand-soft)' : 'transparent', textDecoration: 'none', minHeight: '44px', boxSizing: 'border-box', display: 'flex', alignItems: 'center' } };
+    });
+    const icons = { light: 'M12 3v2M12 19v2M5 12H3M21 12h-2M6.3 6.3 4.9 4.9M19.1 19.1l-1.4-1.4M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z', dark: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z', system: 'M4 5h16v11H4zM8 21h8M12 16v5' };
+    const themes = ['light', 'dark', 'system'].map(t => ({ label: t === 'system' ? 'Match system theme' : t[0].toUpperCase() + t.slice(1) + ' theme', on: this.state.pref === t, icon: icons[t], pick: () => { if (this.app) this.setState({ pref: t }, () => this.app.setPref(t)); },
+      st: { width: '32px', height: '32px', borderRadius: '999px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: this.state.pref === t ? 'var(--bg-card)' : 'transparent', color: this.state.pref === t ? 'var(--brand)' : 'var(--fg-subtle)', boxShadow: this.state.pref === t ? 'var(--shadow-sm)' : 'none' } }));
+    const tk = this.state.toast;
+    return { links, wide, narrow: !wide, themes, menu: this.state.menu, menuOpen: !wide && this.state.menu, toggleMenu: () => this.setState(s => ({ menu: !s.menu })), menuIcon: this.state.menu ? 'M18 6 6 18M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16',
+      hasToast: !!tk, toastMsg: tk ? tk.msg : '', toastStyle: { position: 'fixed', left: '50%', bottom: '24px', transform: 'translateX(-50%)', zIndex: 70, background: tk && tk.kind === 'err' ? 'var(--danger)' : 'var(--bg-inverse)', color: 'var(--fg-inverse)', padding: '12px 18px', borderRadius: '12px', fontSize: '14px', fontWeight: 500, boxShadow: 'var(--shadow-lg)', maxWidth: 'calc(100vw - 40px)' } };
+  }
+}
+</script>
+</body>
+</html>
